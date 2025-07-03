@@ -14,9 +14,16 @@ class Messenger:
 
     def __init__(self, parent=None):
         """Inicializuje objekt Messenger a nastaví výchozí ikony."""
-        self.error_icon_path = Path('ico') / 'error_message.ico'  # ✅ Ikona pro chyby
-        self.info_icon_path = Path('ico') / 'info_message.ico'  # ✅ Ikona pro info
-        self.warning_icon_path = Path('ico') / 'warning_message.ico'  # ✅ Ikona pro varování
+        # 🔍 Základní složka projektu — dvě úrovně nad messenger.py
+        base_dir = Path(__file__).parent.parent
+
+        # 📁 Cesta ke složce s ikonami
+        icon_dir = base_dir / 'resources' / 'ico'
+
+        # ✅ Ikony pro jednotlivé typy zpráv
+        self.error_icon_path = icon_dir / 'error_message.ico'
+        self.info_icon_path = icon_dir / 'info_message.ico'
+        self.warning_icon_path = icon_dir / 'warning_message.ico'
 
         self.parent = parent  # ✅ Připojení k hlavnímu oknu
         self.progress_box = None  # ✅ Inicializace progress boxu
@@ -98,9 +105,6 @@ class Messenger:
         error_dialog.setText(f'[{error_code}]\n{message}')
         error_dialog.setStandardButtons(QMessageBox.StandardButton.Ok)
 
-        if exit_on_close:
-            error_dialog.buttonClicked.connect(lambda: QApplication.quit())
-
         # 📌 Vycentrování okna
         error_dialog.adjustSize()
         if self.parent:
@@ -116,37 +120,7 @@ class Messenger:
             error_dialog.move(screen_center.x() - dialog_rect.width() // 2,
                               screen_center.y() - dialog_rect.height() // 2)
 
-        error_dialog.exec()
-
-    def show_progress_box(self, text='Příprava tisku...'):
-        """ 📌 Zobrazí progress box s textem. """
-        if not self.progress_box:
-            self.progress_box = QMessageBox(self.parent)
-            self.progress_box.setIcon(QMessageBox.Icon.Information)
-            icon_path = Path('ico') / 'message.ico'
-            self.progress_box.setWindowIcon(QIcon(str(icon_path)))
-            self.progress_box.setWindowTitle('Probíhá tisk...')
-            self.progress_box.setStandardButtons(QMessageBox.StandardButton.NoButton)
-            self.progress_box.setFixedSize(400, 200)
-
-        self.progress_box.setText(text)
-        self.progress_box.show()
-        QApplication.instance().processEvents()
-
-    def update_progress_text(self, text):
-        """ 📌 Aktualizuje text progress boxu. """
-        if self.progress_box:
-            self.progress_box.setText(text)
-            self.progress_box.repaint()
-
-    def set_progress_no_buttons(self):
-        """ 📌 Odstraní tlačítka v progress boxu. """
-        if self.progress_box:
-            self.progress_box.setStandardButtons(QMessageBox.StandardButton.NoButton)
-
-    def close_progress_box(self):
-        """ 📌 Zavře progress box a uvolní paměť. """
-        if self.progress_box:
-            self.progress_box.close()
-            self.progress_box.deleteLater()
-            self.progress_box = None
+        # 📌 Zobrazení a kontrola, zda se má ukončit aplikace
+        result = error_dialog.exec()
+        if exit_on_close and result == QMessageBox.StandardButton.Ok:
+            QApplication.quit()
