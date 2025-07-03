@@ -1,8 +1,8 @@
 import hashlib
 import configparser
-from logger import Logger
+from core.logger import Logger
 from pathlib import Path
-from messenger import Messenger
+from core.messenger import Messenger
 
 # 📌 Globální proměnná uchovávající prefix hodnoty
 value_prefix = None
