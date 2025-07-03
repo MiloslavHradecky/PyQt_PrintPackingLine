@@ -1,4 +1,5 @@
 # 🖨️ PyQt_PrintPackingLine
+
 Qt-based desktop app for smart label printing and data parsing using custom triggers and file mappings.
 
 ---
@@ -39,11 +40,11 @@ Podporuje strukturované formáty souborů (`.lbl`, `.nor`), konfiguraci přes `
 
 ## 🚀 Technologies
 
-- **Python 3.10+**  
-- **PyQt6**  
-- **BarTender Commander Integration**  
-- **ConfigParser**  
-- **Regex / File I/O**  
+- **Python 3.10+**
+- **PyQt6**
+- **BarTender Commander Integration**
+- **ConfigParser**
+- **Regex / File I/O**
 
 ---
 

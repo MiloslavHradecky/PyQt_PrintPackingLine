@@ -1,6 +1,4 @@
-import configparser
 import utils.szv_utils
-from pathlib import Path
 from core.logger import Logger
 from core.messenger import Messenger
 
@@ -10,31 +8,22 @@ class LoginController:
     Hlavní řídící třída aplikace.
     """
 
-    def __init__(self, login_window):
+    def __init__(self, login_window, window_stack):
         """
         Inicializuje 'LoginController' a nastaví jeho hlavní atributy.
         :param login_window: Reference na přihlašovací okno ('LoginWindow')
         """
-        self.config = configparser.ConfigParser()  # ✅ Inicializace configparseru
-        self.config.optionxform = str  # ✅ Zajistí zachování velikosti písmen
-        self.config.read('config.ini')  # ✅ Načteme soubor config.ini
-
-        self.archiv_file_path = self.config.get('Paths', 'archiv_file_path')
 
         # 📌 Uložení referencí na okna aplikace
         self.login_window = login_window  # ✅ Uchováme referenci na 'LoginWindow'
+        self.window_stack = window_stack  # ✅ uchováme stack
         self.messenger = Messenger()  # ✅ Inicializujeme instanci 'Messenger' pro správu zpráv
-        self.main_window = None
-        self.product_window = None
-        self.option_controller = None
 
         # 📌 Inicializace třídy 'SzvDecrypt' pro dešifrování přihlášení
         self.decrypter = utils.szv_utils.SzvDecrypt()  # ✅ Načteme dešifrovací třídu
-        self.selection_value_product = None  # ✅ Uchová hodnotu z SelectionWindow
         self.value_prefix = None
 
         # 📌 Inicializace loggerů
-        self.progress_box = None
         self.normal_logger = Logger(spaced=False)  # ✅ Klasický logger
         self.spaced_logger = Logger(spaced=True)  # ✅ Logger s prázdným řádkem
 
@@ -75,10 +64,7 @@ class LoginController:
         - Po úspěšném přihlášení se 'LoginWindow' zavře
         - 'OptionWindow' uchovává referenci na 'ControllerApp'
         """
-        # 📌 Zkontroluj existenci složky a vytvoř ji, pokud neexistuje
-        archiv_path = Path(self.archiv_file_path)
-        if not archiv_path.exists():
-            archiv_path.mkdir(parents=True, exist_ok=True)
+        pass
 
     def handle_exit(self):
         """Zavře LoginWindow a vrátí se na předchozí okno ve stacku."""

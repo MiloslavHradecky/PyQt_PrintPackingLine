@@ -6,6 +6,9 @@ class WindowEffectsManager:
         self._animations = {}
 
     def fade_in(self, widget, duration=700):
+        if widget in self._animations:
+            self._animations[widget].stop()
+
         widget.setWindowOpacity(0.0)
         widget.show()
         animation = QPropertyAnimation(widget, b"windowOpacity")
