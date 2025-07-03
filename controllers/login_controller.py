@@ -36,7 +36,7 @@ class LoginController:
         Ověří přihlašovací heslo a provede autentizaci uživatele.
         - Získá zadané heslo z 'LoginWindow'
         - Ověří správnost hesla pomocí 'SzvDecrypt'
-        - Při úspěšném přihlášení otevře 'ProductWindow'
+        - Při úspěšném přihlášení otevře 'WorkOrderWindow'
         - Při chybě zobrazí varování uživateli
         """
         password = self.login_window.input_password.text().strip()  # ✅ Získání hesla z inputu
@@ -45,7 +45,7 @@ class LoginController:
         try:
             if self.decrypter.check_login(password):
                 self.value_prefix = utils.szv_utils.get_value_prefix()  # ✅ Načtení hodnoty z model.py
-                self.open_option_window()  # ✅ Po úspěšném přihlášení otevřeme OptionWindow
+                self.open_work_order_window()  # ✅ Po úspěšném přihlášení otevřeme WorkOrderWindow
             else:
                 self.normal_logger.log('Warning', f'Zadané heslo "{password}" není správné!', 'LOGCON001')
                 self.messenger.show_warning('Warning', f'Zadané heslo není správné!', 'LOGCON001')
@@ -57,14 +57,16 @@ class LoginController:
             self.login_window.input_password.clear()
             self.login_window.input_password.setFocus()
 
-    def open_option_window(self):
+    def open_work_order_window(self):
         """
-        Otevře 'OptionWindow' pro výběr produktu.
+        Otevře 'WorkOrderWindow' pro výběr produktu.
 
         - Po úspěšném přihlášení se 'LoginWindow' zavře
-        - 'OptionWindow' uchovává referenci na 'ControllerApp'
+        - 'WorkOrderWindow' uchovává referenci na 'ControllerApp'
         """
-        pass
+        from controllers.option_controller import OptionController
+        self.option_controller = OptionController(self.window_stack)
+        self.window_stack.push(self.option_controller.option_window)
 
     def handle_exit(self):
         """Zavře LoginWindow a vrátí se na předchozí okno ve stacku."""
