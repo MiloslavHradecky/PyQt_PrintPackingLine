@@ -63,7 +63,6 @@ class WorkOrderWindow(QWidget):
         # 📌 Pole pro zadání hesla (ID karta)
         self.work_order_input: QLineEdit = QLineEdit()
         self.work_order_input.setFont(input_font)
-        self.work_order_input.setEchoMode(QLineEdit.EchoMode.Password)  # ✅ Skryté zadávání hesla
         self.work_order_input.setPlaceholderText('Naskenujte pracovní příkaz')
         self.work_order_input.setStyleSheet('background-color: white; padding: 5px; color: black; border-radius: 8px; border: 2px solid #FFC107;')
 
