@@ -23,6 +23,8 @@ class LoginController:
         self.decrypter = utils.szv_utils.SzvDecrypt()  # ✅ Načteme dešifrovací třídu
         self.value_prefix = None
 
+        self.work_order_controller = None
+
         # 📌 Inicializace loggerů
         self.normal_logger = Logger(spaced=False)  # ✅ Klasický logger
         self.spaced_logger = Logger(spaced=True)  # ✅ Logger s prázdným řádkem
@@ -64,9 +66,9 @@ class LoginController:
         - Po úspěšném přihlášení se 'LoginWindow' zavře
         - 'WorkOrderWindow' uchovává referenci na 'ControllerApp'
         """
-        from controllers.option_controller import OptionController
-        self.option_controller = OptionController(self.window_stack)
-        self.window_stack.push(self.option_controller.option_window)
+        from controllers.work_order_controller import WorkOrderController
+        self.work_order_controller = WorkOrderController(self.window_stack)
+        self.window_stack.push(self.work_order_controller.work_order_window)
 
     def handle_exit(self):
         """Zavře LoginWindow a vrátí se na předchozí okno ve stacku."""

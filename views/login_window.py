@@ -61,17 +61,17 @@ class LoginWindow(QWidget):
         layout.addWidget(self.logo)
 
         # 📌 Pole pro zadání hesla (ID karta)
-        self.input_password: QLineEdit = QLineEdit()
-        self.input_password.setFont(input_font)
-        self.input_password.setEchoMode(QLineEdit.EchoMode.Password)  # ✅ Skryté zadávání hesla
-        self.input_password.setPlaceholderText('Naskenujte svoji ID kartu')
-        self.input_password.setStyleSheet('background-color: white; padding: 5px; color: black; border-radius: 8px; border: 2px solid #FFC107;')
+        self.password_input: QLineEdit = QLineEdit()
+        self.password_input.setFont(input_font)
+        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)  # ✅ Skryté zadávání hesla
+        self.password_input.setPlaceholderText('Naskenujte svoji ID kartu')
+        self.password_input.setStyleSheet('background-color: white; padding: 5px; color: black; border-radius: 8px; border: 2px solid #FFC107;')
 
         # 📌 Nastavení barvy textu pro placeholder
-        self.palette = self.input_password.palette()
+        self.palette = self.password_input.palette()
         self.placeholder_color = QColor('#757575')  # ✅ Šedá barva pro placeholder text
         self.palette.setColor(QPalette.ColorRole.PlaceholderText, self.placeholder_color)
-        self.input_password.setPalette(self.palette)
+        self.password_input.setPalette(self.palette)
 
         # 📌 Nastavení barvy tlačítek
         button_style = """
@@ -108,10 +108,10 @@ class LoginWindow(QWidget):
         self.exit_button.setStyleSheet(button_style)
 
         # 📌 Propojení tlačítka s akcí přihlášení
-        self.input_password.returnPressed.connect(self.login_button.click)  # ✅ Enter aktivuje tlačítko
+        self.password_input.returnPressed.connect(self.login_button.click)  # ✅ Enter aktivuje tlačítko
 
         # 📌 Přidání prvků do hlavního layoutu
-        layout.addWidget(self.input_password)
+        layout.addWidget(self.password_input)
         layout.addWidget(self.login_button)
         layout.addWidget(self.exit_button)
 
@@ -121,5 +121,5 @@ class LoginWindow(QWidget):
         self.activateWindow()  # ✅ Zajistíme, že okno získá prioritu
         self.raise_()  # ✅ Přivedeme okno do popředí
 
-        self.input_password.setFocus()  # 🎯 automaticky umístí kurzor do pole
+        self.password_input.setFocus()  # 🎯 automaticky umístí kurzor do pole
         self.effects.fade_in(self)  # 🌟 vizuální animace
