@@ -41,8 +41,8 @@ class LoginController:
         - Při úspěšném přihlášení otevře 'WorkOrderWindow'
         - Při chybě zobrazí varování uživateli
         """
-        password = self.login_window.input_password.text().strip()  # ✅ Získání hesla z inputu
-        self.login_window.input_password.clear()
+        password = self.login_window.password_input.text().strip()  # ✅ Získání hesla z inputu
+        self.login_window.password_input.clear()
 
         try:
             if self.decrypter.check_login(password):
@@ -51,13 +51,13 @@ class LoginController:
             else:
                 self.normal_logger.log('Warning', f'Zadané heslo "{password}" není správné!', 'LOGCON001')
                 self.messenger.show_warning('Warning', f'Zadané heslo není správné!', 'LOGCON001')
-                self.login_window.input_password.clear()
-                self.login_window.input_password.setFocus()
+                self.login_window.password_input.clear()
+                self.login_window.password_input.setFocus()
         except Exception as e:
             self.normal_logger.log('Error', f'Neočekávaný problém: {str(e)}', 'LOGCON002')
             self.messenger.show_error('Error', f'{str(e)}', 'LOGCON002', False)
-            self.login_window.input_password.clear()
-            self.login_window.input_password.setFocus()
+            self.login_window.password_input.clear()
+            self.login_window.password_input.setFocus()
 
     def open_work_order_window(self):
         """
