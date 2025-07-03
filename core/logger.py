@@ -24,7 +24,7 @@ class Logger:
             record.levelname = self.ICONS.get(record.levelname, record.levelname)  # ✅ Přidání ikonky
             return super().format(record)
 
-    def __init__(self, config_file='config.ini', spaced=False):
+    def __init__(self, config_file: Path = Path(__file__).parent.parent / 'setup' / 'config.ini', spaced=False):
         """
         Inicializuje 'Logger' a nastaví parametry pro logování.
 
@@ -38,12 +38,13 @@ class Logger:
         config.optionxform = str  # ✅ Zajistí zachování velikosti písmen
         config.read(config_file)
 
-        # 📌 Načtení cesty k log souboru (převod relativní cesty na absolutní)
-        self.log_file_path = Path(config.get('Paths', 'log_file_path')).resolve()
+        # 📌 Získání logovací cesty z configu
+        relative_log_path = config.get('Paths', 'log_file_path', fallback='log/app.log')
+        self.log_file_path = Path(__file__).parent.parent / relative_log_path
+        self.log_file_path = self.log_file_path.resolve()
 
-        # 📌 Vytvoření adresáře pro log soubor, pokud neexistuje
-        self.log_path = self.log_file_path.parent
-        self.log_path.mkdir(parents=True, exist_ok=True)
+        # 📌 Vytvoření složky, pokud neexistuje
+        self.log_file_path.parent.mkdir(parents=True, exist_ok=True)
 
         # 📌 Nastavení základní konfigurace logování
         logging.basicConfig(
