@@ -19,7 +19,6 @@ def main():
 
     def launch_login():
         login_window = LoginWindow()  # ❗️vytvoříme okno bez controlleru
-        login_window.controller = login_controller  # volitelně zpětná reference (pokud používáš)
         login_window.effects.fade_in(login_window, duration=1500)
 
     splash = SplashScreen()

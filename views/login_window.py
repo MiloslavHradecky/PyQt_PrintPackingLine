@@ -31,8 +31,14 @@ class LoginWindow(QWidget):
         self.effects = WindowEffectsManager()
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
 
+        # 📌 Cesty k ikonám
+        base_dir = Path(__file__).parent.parent
+        ico_dir = base_dir / 'resources' / 'ico'
+
+        icon_login_path = ico_dir / 'login.ico'
+        login_logo = ico_dir / 'login.tiff'
+
         # 📌 Nastavení ikony okna
-        icon_login_path = Path('ico') / 'login.ico'
         self.setWindowIcon(QIcon(str(icon_login_path)))  # ✅ Ikona aplikace
 
         # 📌 Definice fontů pro UI prvky
@@ -48,7 +54,6 @@ class LoginWindow(QWidget):
         layout = QVBoxLayout()
 
         # 📌 Logo aplikace
-        login_logo = Path('ico') / 'login.tiff'
         self.logo = QLabel(self)
         pixmap = QPixmap(str(login_logo)).scaled(self.width() - 20, 256, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         self.logo.setPixmap(pixmap)
