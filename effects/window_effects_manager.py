@@ -5,7 +5,7 @@ class WindowEffectsManager:
     def __init__(self):
         self._animations = {}
 
-    def fade_in(self, widget, duration=700):
+    def fade_in(self, widget, duration=3000):
         if widget in self._animations:
             self._animations[widget].stop()
 
@@ -18,7 +18,7 @@ class WindowEffectsManager:
         animation.start()
         self._animations[widget] = animation  # ochrání před GC
 
-    def fade_out(self, widget, duration=700):
+    def fade_out(self, widget, duration=2000):
         animation = QPropertyAnimation(widget, b"windowOpacity")
         animation.setDuration(duration)
         animation.setStartValue(1.0)

@@ -5,7 +5,7 @@ from PyQt6.QtGui import QFont, QPalette, QColor, QPixmap, QIcon
 from effects.window_effects_manager import WindowEffectsManager
 
 
-class WorkOrderWindow(QWidget):
+class PrintWindow(QWidget):
     """
     Třída představující přihlašovací okno aplikace.
     - Zobrazuje vstupní pole pro heslo (skrytý text)
@@ -15,7 +15,7 @@ class WorkOrderWindow(QWidget):
 
     def __init__(self, controller=None):
         """
-        Inicializuje 'WorkOrderWindow' a nastaví jeho vizuální vzhled.
+        Inicializuje 'PrintWindow' a nastaví jeho vizuální vzhled.
         - Přijímá 'controller', který spravuje logiku přihlášení
         - Nastavuje ikonu okna
         - Definuje fonty, barvy a celkové UI rozvržení
@@ -25,7 +25,7 @@ class WorkOrderWindow(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
         # 📌 Nastavení názvu a velikosti okna
-        self.setWindowTitle('Work Order')
+        self.setWindowTitle('Print Line B')
         self.setFixedSize(400, 500)
 
         self.effects = WindowEffectsManager()
@@ -35,11 +35,11 @@ class WorkOrderWindow(QWidget):
         base_dir = Path(__file__).parent.parent
         ico_dir = base_dir / 'resources' / 'ico'
 
-        icon_login_path = ico_dir / 'work_order_find.ico'
-        login_logo = ico_dir / 'work_order_find.png'
+        icon_print_path = ico_dir / 'work_order_find.ico'
+        print_logo = ico_dir / 'work_order_find.png'
 
         # 📌 Nastavení ikony okna
-        self.setWindowIcon(QIcon(str(icon_login_path)))  # ✅ Ikona aplikace
+        self.setWindowIcon(QIcon(str(icon_print_path)))  # ✅ Ikona aplikace
 
         # 📌 Definice fontů pro UI prvky
         button_font = QFont('Arial', 16, QFont.Weight.Bold)
@@ -55,22 +55,22 @@ class WorkOrderWindow(QWidget):
 
         # 📌 Logo aplikace
         self.logo = QLabel(self)
-        pixmap = QPixmap(str(login_logo)).scaled(self.width() - 20, 256, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        pixmap = QPixmap(str(print_logo)).scaled(self.width() - 20, 256, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         self.logo.setPixmap(pixmap)
         self.logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.logo)
 
         # 📌 Pole pro zadání hesla (ID karta)
-        self.work_order_input: QLineEdit = QLineEdit()
-        self.work_order_input.setFont(input_font)
-        self.work_order_input.setPlaceholderText('Naskenujte pracovní příkaz')
-        self.work_order_input.setStyleSheet('background-color: white; padding: 5px; color: black; border-radius: 8px; border: 2px solid #FFC107;')
+        self.serial_number_input: QLineEdit = QLineEdit()
+        self.serial_number_input.setFont(input_font)
+        self.serial_number_input.setPlaceholderText('Naskenujte serial number')
+        self.serial_number_input.setStyleSheet('background-color: white; padding: 5px; color: black; border-radius: 8px; border: 2px solid #FFC107;')
 
         # 📌 Nastavení barvy textu pro placeholder
-        self.palette = self.work_order_input.palette()
+        self.palette = self.serial_number_input.palette()
         self.placeholder_color = QColor('#757575')  # ✅ Šedá barva pro placeholder text
         self.palette.setColor(QPalette.ColorRole.PlaceholderText, self.placeholder_color)
-        self.work_order_input.setPalette(self.palette)
+        self.serial_number_input.setPalette(self.palette)
 
         # 📌 Nastavení barvy tlačítek
         button_style = """
@@ -97,9 +97,9 @@ class WorkOrderWindow(QWidget):
             """
 
         # 📌 Tlačítko pro přihlášení
-        self.next_button: QPushButton = QPushButton('Pokračuj')
-        self.next_button.setFont(button_font)
-        self.next_button.setStyleSheet(button_style)
+        self.print_button: QPushButton = QPushButton('Tisk')
+        self.print_button.setFont(button_font)
+        self.print_button.setStyleSheet(button_style)
 
         # 📌 Tlačítko pro výběr 'Ukončit'
         self.exit_button: QPushButton = QPushButton('Ukončit')
@@ -107,11 +107,11 @@ class WorkOrderWindow(QWidget):
         self.exit_button.setStyleSheet(button_style)
 
         # 📌 Propojení tlačítka s akcí přihlášení
-        self.work_order_input.returnPressed.connect(self.next_button.click)  # ✅ Enter aktivuje tlačítko
+        self.serial_number_input.returnPressed.connect(self.print_button.click)  # ✅ Enter aktivuje tlačítko
 
         # 📌 Přidání prvků do hlavního layoutu
-        layout.addWidget(self.work_order_input)
-        layout.addWidget(self.next_button)
+        layout.addWidget(self.serial_number_input)
+        layout.addWidget(self.print_button)
         layout.addWidget(self.exit_button)
 
         # 📌 Nastavení layoutu okna
@@ -120,5 +120,5 @@ class WorkOrderWindow(QWidget):
         self.activateWindow()  # ✅ Zajistíme, že okno získá prioritu
         self.raise_()  # ✅ Přivedeme okno do popředí
 
-        self.work_order_input.setFocus()  # 🎯 automaticky umístí kurzor do pole
+        self.serial_number_input.setFocus()  # 🎯 automaticky umístí kurzor do pole
         self.effects.fade_in(self, duration=3000)  # 🌟 vizuální animace

@@ -25,7 +25,7 @@ def main():
         login_controller = LoginController(login_window, window_stack)  # předáme okno controlleru
         login_window.controller = login_controller  # volitelně zpětná reference (pokud používáš)
         window_stack.push(login_window)  # ✅ Tohle je důležité!
-        login_window.effects.fade_in(login_window, duration=1500)
+        login_window.effects.fade_in(login_window, duration=2000)
 
     splash = SplashScreen()
     splash.start(launch_login)

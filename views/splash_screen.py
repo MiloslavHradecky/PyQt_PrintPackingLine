@@ -44,7 +44,7 @@ class SplashScreen(QSplashScreen):
 
     def _animate_fade_in(self):
         self.animation = QPropertyAnimation(self, b"windowOpacity")
-        self.animation.setDuration(1200)
+        self.animation.setDuration(2000)
         self.animation.setStartValue(0.0)
         self.animation.setEndValue(0.9)
         self.animation.start()

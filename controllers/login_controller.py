@@ -72,4 +72,4 @@ class LoginController:
 
     def handle_exit(self):
         """Zavře LoginWindow a vrátí se na předchozí okno ve stacku."""
-        self.login_window.effects.fade_out(self.login_window, duration=3000)  # ✅ To spustí signal destroyed → stack manager udělá své
+        self.login_window.effects.fade_out(self.login_window, duration=2000)  # ✅ To spustí signal destroyed → stack manager udělá své

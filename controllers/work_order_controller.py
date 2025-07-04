@@ -54,6 +54,49 @@ class WorkOrderController:
             self.work_order_window.work_order_input.clear()
             self.work_order_window.work_order_input.setFocus()
 
+        try:
+            with self.nor_file.open('r') as file:
+                first_line = file.readline().strip()
+                parts = first_line.split(';')
+
+                if len(parts) >= 2:
+                    nor_order_code = parts[0].lstrip('$').upper()
+                    product_name = parts[1].strip()
+
+                    if nor_order_code != value_input:
+                        self.normal_logger.log('Warning', f'Výrobní příkaz v souboru .NOR ({nor_order_code}) neodpovídá zadanému vstupu ({value_input})!', 'WORDCON003')
+                        self.messenger.show_warning('Warning', f'Výrobní příkaz v souboru .NOR ({nor_order_code}) neodpovídá zadanému vstupu ({value_input})!', 'WORDCON003')
+                        return
+
+                    self.found_product_name = product_name
+                    self.lines = self.load_file(self.lbl_file)
+
+                    # 📌 Tady zavoláme další okno:
+                    self.open_app_window(order_code=value_input, product_name=product_name)
+
+                else:
+                    self.normal_logger.log('Warning', f'Řádek v souboru {self.nor_file} nemá očekávaný formát.', 'WORDCON004')
+                    self.messenger.show_warning('Warning', f'Řádek v souboru {self.nor_file} nemá očekávaný formát.', 'WORDCON004')
+        except Exception as e:
+            self.normal_logger.log('Error', f'Neočekávaná chyba při zpracování .NOR souboru: {e}', 'WORDCON005')
+            self.messenger.show_error('Error', f'{e}', 'WORDCON005', exit_on_close=False)
+
+    def load_file(self, file_path: Path) -> list[str]:
+        """
+        Načte řádky ze zadaného souboru.
+        """
+        try:
+            return file_path.read_text().splitlines()
+        except Exception as e:
+            self.normal_logger.log('Error', f'Soubor {file_path} se nepodařilo načíst: {e}', 'WORDCON006')
+            self.messenger.show_error('Error', f'{e}', 'WORDCON006', False)
+            return []
+
+    def open_app_window(self, order_code, product_name):
+        self.app_window = AppWindow(order_code, product_name, intermediate_instance=self)
+        self.app_window.show()
+        self.work_order_window.close()
+
     def handle_exit(self):
         """Zavře WorkOrderWindow a vrátí se na předchozí okno ve stacku."""
-        self.work_order_window.effects.fade_out(self.work_order_window, duration=3000)  # ✅ To spustí signal destroyed → stack manager udělá své
+        self.work_order_window.effects.fade_out(self.work_order_window, duration=2000)  # ✅ To spustí signal destroyed → stack manager udělá své

@@ -122,4 +122,4 @@ class LoginWindow(QWidget):
         self.raise_()  # ✅ Přivedeme okno do popředí
 
         self.password_input.setFocus()  # 🎯 automaticky umístí kurzor do pole
-        self.effects.fade_in(self)  # 🌟 vizuální animace
+        self.effects.fade_in(self, duration=3000)  # 🌟 vizuální animace
