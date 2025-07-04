@@ -39,8 +39,8 @@ class PrintWindow(QWidget):
         base_dir = Path(__file__).parent.parent
         ico_dir = base_dir / 'resources' / 'ico'
 
-        icon_print_path = ico_dir / 'work_order_find.ico'
-        print_logo = ico_dir / 'work_order_find.png'
+        icon_print_path = ico_dir / 'print.ico'
+        print_logo = ico_dir / 'print.png'
 
         # 📌 Nastavení ikony okna
         self.setWindowIcon(QIcon(str(icon_print_path)))  # ✅ Ikona aplikace
