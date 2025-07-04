@@ -55,6 +55,7 @@ class WorkOrderController:
             self.messenger.show_warning('Warning', f'Soubor {self.lbl_file} nebo {self.nor_file} nebyl nalezen!', 'WORDCON002')
             self.work_order_window.work_order_input.clear()
             self.work_order_window.work_order_input.setFocus()
+            return
 
         try:
             with self.nor_file.open('r') as file:
@@ -85,11 +86,13 @@ class WorkOrderController:
                     self.messenger.show_warning('Warning', f'Řádek v souboru {self.nor_file} nemá očekávaný formát.', 'WORDCON004')
                     self.work_order_window.work_order_input.clear()
                     self.work_order_window.work_order_input.setFocus()
+                    return
         except Exception as e:
             self.normal_logger.log('Error', f'Neočekávaná chyba při zpracování .NOR souboru: {e}', 'WORDCON005')
             self.messenger.show_error('Error', f'{e}', 'WORDCON005', exit_on_close=False)
             self.work_order_window.work_order_input.clear()
             self.work_order_window.work_order_input.setFocus()
+            return
 
     def load_file(self, file_path: Path) -> list[str]:
         """
