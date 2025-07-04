@@ -13,7 +13,7 @@ class PrintWindow(QWidget):
     - Propojená s 'ControllerApp', která zpracovává přihlášení
     """
 
-    def __init__(self, controller=None):
+    def __init__(self, order_code: str, product_name: str, controller=None):
         """
         Inicializuje 'PrintWindow' a nastaví jeho vizuální vzhled.
         - Přijímá 'controller', který spravuje logiku přihlášení
@@ -21,6 +21,10 @@ class PrintWindow(QWidget):
         - Definuje fonty, barvy a celkové UI rozvržení
         """
         super().__init__()
+
+        self.order_code = order_code
+        self.product_name = product_name
+        self.controller = controller
 
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 

@@ -15,6 +15,8 @@ class WorkOrderController:
         self.nor_file = None
         self.lines = None
         self.found_product_name = None
+        self.print_controller = None
+        self.print_window = None
 
         # 📌 Inicializace loggerů
         self.normal_logger = Logger(spaced=False)  # ✅ Klasický logger
@@ -93,9 +95,9 @@ class WorkOrderController:
             return []
 
     def open_app_window(self, order_code, product_name):
-        self.app_window = AppWindow(order_code, product_name, intermediate_instance=self)
-        self.app_window.show()
-        self.work_order_window.close()
+        from controllers.print_controller import PrintController
+        self.print_controller = PrintController(self.window_stack, order_code, product_name)
+        self.window_stack.push(self.print_controller.print_window)
 
     def handle_exit(self):
         """Zavře WorkOrderWindow a vrátí se na předchozí okno ve stacku."""

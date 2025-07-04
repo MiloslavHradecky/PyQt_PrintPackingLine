@@ -5,16 +5,11 @@ from views.print_window import PrintWindow
 
 
 class PrintController:
-    def __init__(self, window_stack):
+    def __init__(self, window_stack, order_code: str, product_name: str):
         self.window_stack = window_stack
-        self.print_window = PrintWindow(controller=self)
+        self.print_window = PrintWindow(order_code, product_name, controller=self)
 
         self.messenger = Messenger()
-        self.orders_dir = None
-        self.lbl_file = None
-        self.nor_file = None
-        self.lines = None
-        self.found_product_name = None
 
         # 📌 Inicializace loggerů
         self.normal_logger = Logger(spaced=False)  # ✅ Klasický logger
