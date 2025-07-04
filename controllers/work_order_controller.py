@@ -23,10 +23,10 @@ class WorkOrderController:
         self.spaced_logger = Logger(spaced=True)  # ✅ Logger s prázdným řádkem
 
         # 📌 Propojení tlačítka s metodou
-        self.work_order_window.next_button.clicked.connect(self.on_button_click)
+        self.work_order_window.next_button.clicked.connect(self.work_order_button_click)
         self.work_order_window.exit_button.clicked.connect(self.handle_exit)
 
-    def on_button_click(self):
+    def work_order_button_click(self):
         """
         Zpracování události kliknutí na tlačítko:
         - Získá vstupní hodnotu
@@ -68,6 +68,8 @@ class WorkOrderController:
                     if nor_order_code != value_input:
                         self.normal_logger.log('Warning', f'Výrobní příkaz v souboru .NOR ({nor_order_code}) neodpovídá zadanému vstupu ({value_input})!', 'WORDCON003')
                         self.messenger.show_warning('Warning', f'Výrobní příkaz v souboru .NOR ({nor_order_code}) neodpovídá zadanému vstupu ({value_input})!', 'WORDCON003')
+                        self.work_order_window.work_order_input.clear()
+                        self.work_order_window.work_order_input.setFocus()
                         return
 
                     self.found_product_name = product_name
@@ -75,13 +77,19 @@ class WorkOrderController:
 
                     # 📌 Tady zavoláme další okno:
                     self.open_app_window(order_code=value_input, product_name=product_name)
+                    self.work_order_window.work_order_input.clear()
+                    self.work_order_window.work_order_input.setFocus()
 
                 else:
                     self.normal_logger.log('Warning', f'Řádek v souboru {self.nor_file} nemá očekávaný formát.', 'WORDCON004')
                     self.messenger.show_warning('Warning', f'Řádek v souboru {self.nor_file} nemá očekávaný formát.', 'WORDCON004')
+                    self.work_order_window.work_order_input.clear()
+                    self.work_order_window.work_order_input.setFocus()
         except Exception as e:
             self.normal_logger.log('Error', f'Neočekávaná chyba při zpracování .NOR souboru: {e}', 'WORDCON005')
             self.messenger.show_error('Error', f'{e}', 'WORDCON005', exit_on_close=False)
+            self.work_order_window.work_order_input.clear()
+            self.work_order_window.work_order_input.setFocus()
 
     def load_file(self, file_path: Path) -> list[str]:
         """
