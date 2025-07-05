@@ -1,3 +1,6 @@
+# ⚙️ ConfigLoader – parses INI files into typed accessors using Pathlib
+# Načítá hodnoty z .ini konfiguračního souboru jako cesty, seznamy nebo hodnoty
+
 from configparser import ConfigParser
 from pathlib import Path
 
@@ -5,46 +8,51 @@ from pathlib import Path
 class ConfigLoader:
     def __init__(self, config_path: Path = Path(__file__).parent.parent / 'setup' / 'config.ini'):
         """
-        Načte a zpracuje konfigurační soubor .ini pomocí Pathlib.
+        Initializes and loads the config file.
+        Inicializuje a načte konfigurační soubor .ini pomocí Pathlib.
 
-        :param config_path: Cesta ke konfiguračnímu souboru jako Path objekt.
+        :param config_path: Path to config file (default is ../setup/config.ini)
+                           Cesta ke konfiguračnímu souboru
         """
         if not config_path.exists():
             raise FileNotFoundError(f'Config file "{config_path}" not found.')
 
         self.config_path = config_path.resolve()
         self.config = ConfigParser()
-        self.config.optionxform = str  # zachování velikosti písmen
+        self.config.optionxform = str  # 🟩 Preserve casing / zachování velikosti písmen
         self.config.read(self.config_path)
 
     def get_path(self, key: str, fallback: str = None) -> Path | None:
         """
-        Vrátí absolutní cestu ze sekce [Paths] jako Path objekt.
+        Returns a resolved Path from the [Paths] section.
+        Vrací absolutní cestu z [Paths] sekce podle klíče.
 
-        :param key: Název klíče v sekci Paths
-        :param fallback: Náhradní hodnota pokud není nalezena
-        :return: Path objekt nebo None
+        :param key: Key in the [Paths] section / Název klíče
+        :param fallback: Default if key not found / Náhradní hodnota
+        :return: Resolved Path object or None
         """
         raw = self.config.get('Paths', key, fallback=fallback)
         return Path(raw).resolve() if raw else None
 
     def get_trigger_values(self, section: str, trigger_name: str) -> list[str]:
         """
-        Vrátí seznam hodnot pro daný trigger ze zadané sekce.
+        Returns list of values for a given trigger in the specified section.
+        Vrací seznam hodnot pro konkrétní trigger v dané sekci.
 
-        :param section: Název sekce (např. ProductTriggerMapping)
-        :param trigger_name: Název triggeru (např. C4-SMART)
-        :return: Seznam hodnot
+        :param section: Section name / Název sekce (např. ProductTriggerMapping)
+        :param trigger_name: Key name / Název triggeru (např. C4-SMART)
+        :return: List of trimmed values / Seznam hodnot
         """
         raw = self.config.get(section, trigger_name, fallback='')
         return [v.strip() for v in raw.split(',') if v.strip()]
 
     def get_all_triggers(self, section: str) -> dict[str, list[str]]:
         """
-        Vrátí všechny triggery ze sekce jako slovník.
+        Returns all triggers from section as a dictionary.
+        Vrací všechny triggery v dané sekci jako slovník.
 
-        :param section: Název sekce
-        :return: Dict jako {trigger_name: [values]}
+        :param section: Section name / Název sekce
+        :return: Dict of {trigger_name: [values]} / Slovník
         """
         if section not in self.config:
             return {}
@@ -56,11 +64,12 @@ class ConfigLoader:
 
     def get_value(self, section: str, key: str, fallback: str = None) -> str | None:
         """
-        Vrátí hodnotu ze zadané sekce a klíče.
+        Returns a value from any section as string.
+        Vrátí hodnotu z libovolné sekce jako řetězec.
 
-        :param section: Název sekce
-        :param key: Název klíče
-        :param fallback: Náhradní hodnota
-        :return: Hodnota jako řetězec
+        :param section: Section name / Název sekce
+        :param key: Key name / Název klíče
+        :param fallback: Default value / Náhradní hodnota
+        :return: String or None
         """
         return self.config.get(section, key, fallback=fallback)
