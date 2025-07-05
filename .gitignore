@@ -177,4 +177,5 @@ cython_debug/
 .idea/workspace.xml
 workspace.xml
 log/*.log
-setup/
+setup/*.ini
+setup/*.py
