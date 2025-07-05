@@ -7,72 +7,67 @@ from effects.window_effects_manager import WindowEffectsManager
 
 class WorkOrderWindow(QWidget):
     """
-    Třída představující přihlašovací okno aplikace.
-    - Zobrazuje vstupní pole pro heslo (skrytý text)
-    - Má tlačítko pro potvrzení přihlášení
-    - Propojená s 'ControllerApp', která zpracovává přihlášení
+    UI window for entering a work order (e.g., barcode/ID).
+    Okno pro zadání nebo skenování pracovního příkazu.
     """
 
     def __init__(self, controller=None):
         """
-        Inicializuje 'WorkOrderWindow' a nastaví jeho vizuální vzhled.
-        - Přijímá 'controller', který spravuje logiku přihlášení
-        - Nastavuje ikonu okna
-        - Definuje fonty, barvy a celkové UI rozvržení
+        Initializes window appearance and layout.
+        Inicializuje vzhled a komponenty okna.
         """
         super().__init__()
 
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
-        # 📌 Nastavení názvu a velikosti okna
+        # 📌 Title and dimensions / Název a velikost okna
         self.setWindowTitle('Work Order')
         self.setFixedSize(400, 500)
 
         self.effects = WindowEffectsManager()
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
 
-        # 📌 Cesty k ikonám
+        # 📌 Icon and logo paths / Cesty k ikonám
         base_dir = Path(__file__).parent.parent
         ico_dir = base_dir / 'resources' / 'ico'
+        work_order_icon_path = ico_dir / 'work_order_find.ico'
+        work_order_logo = ico_dir / 'work_order_find.png'
 
-        icon_login_path = ico_dir / 'work_order_find.ico'
-        login_logo = ico_dir / 'work_order_find.png'
+        # 📌 App icon / Ikona aplikace
+        self.setWindowIcon(QIcon(str(work_order_icon_path)))
 
-        # 📌 Nastavení ikony okna
-        self.setWindowIcon(QIcon(str(icon_login_path)))  # ✅ Ikona aplikace
-
-        # 📌 Definice fontů pro UI prvky
+        # 📌 Font settings / Definice fontů
         button_font = QFont('Arial', 16, QFont.Weight.Bold)
         input_font = QFont('Arial', 12, QFont.Weight.Bold)
 
-        # 📌 Nastavení barvy pozadí okna
+        # 📌 Window background / Barva pozadí
         palette = QPalette()
-        palette.setColor(QPalette.ColorRole.Window, QColor('#D8E9F3'))  # ✅ Světle modrá barva pozadí
+        palette.setColor(QPalette.ColorRole.Window, QColor('#D8E9F3'))
         self.setPalette(palette)
 
-        # 📌 Hlavní layout okna
+        # 📌 Main window layout / Hlavní layout okna
         layout = QVBoxLayout()
 
-        # 📌 Logo aplikace
+        # 📌 Application logo / Logo aplikace
         self.logo = QLabel(self)
-        pixmap = QPixmap(str(login_logo)).scaled(self.width() - 20, 256, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        pixmap = QPixmap(str(work_order_logo)).scaled(self.width() - 20, 256, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         self.logo.setPixmap(pixmap)
         self.logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.logo)
 
-        # 📌 Pole pro zadání hesla (ID karta)
+        # 📌 Work order input field / Vstupní pole pro příkaz
         self.work_order_input: QLineEdit = QLineEdit()
         self.work_order_input.setFont(input_font)
         self.work_order_input.setPlaceholderText('Naskenujte pracovní příkaz')
         self.work_order_input.setStyleSheet('background-color: white; padding: 5px; color: black; border-radius: 8px; border: 2px solid #FFC107;')
 
-        # 📌 Nastavení barvy textu pro placeholder
+        # 📌 Placeholder color / Barva nápovědy
         self.palette = self.work_order_input.palette()
-        self.placeholder_color = QColor('#757575')  # ✅ Šedá barva pro placeholder text
+        self.placeholder_color = QColor('#757575')
         self.palette.setColor(QPalette.ColorRole.PlaceholderText, self.placeholder_color)
         self.work_order_input.setPalette(self.palette)
 
-        # 📌 Nastavení barvy tlačítek
+        # 📌 Button style sheet / Styl pro tlačítka
         button_style = """
             QPushButton {
                 background-color: #1976D2;
@@ -96,29 +91,29 @@ class WorkOrderWindow(QWidget):
             }
             """
 
-        # 📌 Tlačítko pro přihlášení
+        # ⏭️ Continue button / Tlačítko Pokračuj
         self.next_button: QPushButton = QPushButton('Pokračuj')
         self.next_button.setFont(button_font)
         self.next_button.setStyleSheet(button_style)
 
-        # 📌 Tlačítko pro výběr 'Ukončit'
+        # ❌ Exit button / Tlačítko Ukončit
         self.exit_button: QPushButton = QPushButton('Ukončit')
         self.exit_button.setFont(button_font)
         self.exit_button.setStyleSheet(button_style)
 
-        # 📌 Propojení tlačítka s akcí přihlášení
-        self.work_order_input.returnPressed.connect(self.next_button.click)  # ✅ Enter aktivuje tlačítko
+        # 📌 Enter triggers continue / Enter aktivuje pokračování
+        self.work_order_input.returnPressed.connect(self.next_button.click)
 
-        # 📌 Přidání prvků do hlavního layoutu
+        # 📦 Add widgets to layout / Přidání prvků do hlavního layoutu
         layout.addWidget(self.work_order_input)
         layout.addWidget(self.next_button)
         layout.addWidget(self.exit_button)
 
-        # 📌 Nastavení layoutu okna
+        # 📌 Setting the window layout / Nastavení layoutu okna
         self.setLayout(layout)
 
-        self.activateWindow()  # ✅ Zajistíme, že okno získá prioritu
-        self.raise_()  # ✅ Přivedeme okno do popředí
-
-        self.work_order_input.setFocus()  # 🎯 automaticky umístí kurzor do pole
-        self.effects.fade_in(self, duration=3000)  # 🌟 vizuální animace
+        # ⬆️ Window priority and visual effect / Priorita oken a vizuální efekt
+        self.activateWindow()
+        self.raise_()
+        self.work_order_input.setFocus()
+        self.effects.fade_in(self, duration=3000)  # 🌟 Visual animation / Vizuální animace
