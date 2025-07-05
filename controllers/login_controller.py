@@ -5,55 +5,65 @@ from core.messenger import Messenger
 
 class LoginController:
     """
-    Hlavní řídící třída aplikace.
+    Main controller for the login process.
+    Hlavní řídící třída pro přihlášení uživatele.
     """
 
     def __init__(self, login_window, window_stack):
         """
-        Inicializuje 'LoginController' a nastaví jeho hlavní atributy.
-        :param login_window: Reference na přihlašovací okno ('LoginWindow')
+        Initializes the LoginController and connects event handlers.
+        Inicializuje LoginController a nastaví potřebné reference.
+
+        :param login_window: Reference to LoginWindow / Odkaz na přihlašovací okno
+        :param window_stack: WindowStackManager for screen navigation
         """
 
-        # 📌 Uložení referencí na okna aplikace
-        self.login_window = login_window  # ✅ Uchováme referenci na 'LoginWindow'
-        self.window_stack = window_stack  # ✅ uchováme stack
-        self.messenger = Messenger()  # ✅ Inicializujeme instanci 'Messenger' pro správu zpráv
+        # 📌 Store UI references / Uchování referencí na okna
+        self.login_window = login_window
+        self.window_stack = window_stack
 
-        # 📌 Inicializace třídy 'SzvDecrypt' pro dešifrování přihlášení
-        self.decrypter = utils.szv_utils.SzvDecrypt()  # ✅ Načteme dešifrovací třídu
+        # 📌 Initialize messenger for user feedback / Zprávy pro uživatele
+        self.messenger = Messenger()
+
+        # 🔐 Load decryption engine for login verification / Inicializujeme třídu pro ověření hesla (např. pomocí ID karty)
+        self.decrypter = utils.szv_utils.SzvDecrypt()
+
         self.value_prefix = None
-
         self.work_order_controller = None
 
-        # 📌 Inicializace loggerů
-        self.normal_logger = Logger(spaced=False)  # ✅ Klasický logger
-        self.spaced_logger = Logger(spaced=True)  # ✅ Logger s prázdným řádkem
+        # 📌 Initialize logging system / Inicializujeme loggery
+        self.normal_logger = Logger(spaced=False)
+        self.spaced_logger = Logger(spaced=True)
 
-        # 📌 Propojení tlačítka s metodou
+        # 🔗 Connect buttons to handlers / Propojení UI s metodami
         self.login_window.login_button.clicked.connect(self.handle_login)
         self.login_window.exit_button.clicked.connect(self.handle_exit)
 
     def handle_login(self):
         """
-        Ověří přihlašovací heslo a provede autentizaci uživatele.
-        - Získá zadané heslo z 'LoginWindow'
-        - Ověří správnost hesla pomocí 'SzvDecrypt'
-        - Při úspěšném přihlášení otevře 'WorkOrderWindow'
-        - Při chybě zobrazí varování uživateli
+        Handles login validation and user authentication.
+        Zpracuje přihlášení, ověří ID a otevře další okno.
+
+        - Retrieves password from LoginWindow
+        - Verifies password via SzvDecrypt
+        - Opens WorkOrderWindow if successful
+        - Shows warning on failure
         """
-        password = self.login_window.password_input.text().strip()  # ✅ Získání hesla z inputu
+        password = self.login_window.password_input.text().strip()  # 🔐 Getting password from input / Získání hesla z inputu
         self.login_window.password_input.clear()
 
         try:
             if self.decrypter.check_login(password):
-                self.value_prefix = utils.szv_utils.get_value_prefix()  # ✅ Načtení hodnoty z model.py
-                self.open_work_order_window()  # ✅ Po úspěšném přihlášení otevřeme WorkOrderWindow
+                self.value_prefix = utils.szv_utils.get_value_prefix()
+                self.open_work_order_window()
             else:
+                # 🟡 Incorrect password entered
                 self.normal_logger.log('Warning', f'Zadané heslo "{password}" není správné!', 'LOGCON001')
                 self.messenger.show_warning('Warning', f'Zadané heslo není správné!', 'LOGCON001')
                 self.login_window.password_input.clear()
                 self.login_window.password_input.setFocus()
         except Exception as e:
+            # 🔴 Unexpected login failure
             self.normal_logger.log('Error', f'Neočekávaný problém: {str(e)}', 'LOGCON002')
             self.messenger.show_error('Error', f'{str(e)}', 'LOGCON002', False)
             self.login_window.password_input.clear()
@@ -61,15 +71,20 @@ class LoginController:
 
     def open_work_order_window(self):
         """
-        Otevře 'WorkOrderWindow' pro výběr produktu.
+        Opens the WorkOrderWindow upon successful login.
+        Otevře další okno aplikace pro zpracování výrobních příkazů.
 
-        - Po úspěšném přihlášení se 'LoginWindow' zavře
-        - 'WorkOrderWindow' uchovává referenci na 'ControllerApp'
+        - Fades out login window
+        - Pushes next window to stack
         """
         from controllers.work_order_controller import WorkOrderController
         self.work_order_controller = WorkOrderController(self.window_stack)
         self.window_stack.push(self.work_order_controller.work_order_window)
 
     def handle_exit(self):
-        """Zavře LoginWindow a vrátí se na předchozí okno ve stacku."""
-        self.login_window.effects.fade_out(self.login_window, duration=2000)  # ✅ To spustí signal destroyed → stack manager udělá své
+        """
+        Handles application exit from login screen.
+        Zpracuje ukončení aplikace z přihlašovacího okna.
+        """
+        # 💡 This triggers signal destroyed → stack manager does its thing / To spustí signal destroyed → stack manager udělá své
+        self.login_window.effects.fade_out(self.login_window, duration=2000)
