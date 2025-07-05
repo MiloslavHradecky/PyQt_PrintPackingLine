@@ -176,3 +176,4 @@ cython_debug/
 # Private configuration file
 .idea/workspace.xml
 workspace.xml
+log/*.log
