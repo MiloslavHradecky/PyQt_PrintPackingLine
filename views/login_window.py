@@ -7,73 +7,77 @@ from effects.window_effects_manager import WindowEffectsManager
 
 class LoginWindow(QWidget):
     """
+    Class representing the application login window.
     Třída představující přihlašovací okno aplikace.
-    - Zobrazuje vstupní pole pro heslo (skrytý text)
-    - Má tlačítko pro potvrzení přihlášení
-    - Propojená s 'ControllerApp', která zpracovává přihlášení
+
+    - Displays the password input field (hidden text)
+    - Has a button to confirm the login
+    - Linked to the ‘ControllerApp’ that processes the login
     """
 
     def __init__(self, controller=None):
         """
+        Initializes the ‘LoginWindow’ and sets its visual appearance.
         Inicializuje 'LoginWindow' a nastaví jeho vizuální vzhled.
-        - Přijímá 'controller', který spravuje logiku přihlášení
-        - Nastavuje ikonu okna
-        - Definuje fonty, barvy a celkové UI rozvržení
+
+        - Receives a ‘controller’ that manages the login logic
+        - Sets the icon of the window
+        - Defines fonts, colors and overall UI layout
         """
         super().__init__()
 
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
-        # 📌 Nastavení názvu a velikosti okna
+        # 📌 Setting the window name and size / Nastavení názvu a velikosti okna
         self.setWindowTitle('Přihlášení')
         self.setFixedSize(400, 500)
 
         self.effects = WindowEffectsManager()
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
 
-        # 📌 Cesty k ikonám
+        # 📌 Paths to icons / Cesty k ikonám
         base_dir = Path(__file__).parent.parent
         ico_dir = base_dir / 'resources' / 'ico'
 
         icon_login_path = ico_dir / 'login.ico'
         login_logo = ico_dir / 'login.tiff'
 
-        # 📌 Nastavení ikony okna
-        self.setWindowIcon(QIcon(str(icon_login_path)))  # ✅ Ikona aplikace
+        # 📌 Window icon settings / Nastavení ikony okna
+        self.setWindowIcon(QIcon(str(icon_login_path)))
 
-        # 📌 Definice fontů pro UI prvky
+        # 📌 Defining fonts for UI elements / Definice fontů pro UI prvky
         button_font = QFont('Arial', 16, QFont.Weight.Bold)
         input_font = QFont('Arial', 12, QFont.Weight.Bold)
 
-        # 📌 Nastavení barvy pozadí okna
+        # 📌 Setting the window background colour / Nastavení barvy pozadí okna
         palette = QPalette()
-        palette.setColor(QPalette.ColorRole.Window, QColor('#D8E9F3'))  # ✅ Světle modrá barva pozadí
+        palette.setColor(QPalette.ColorRole.Window, QColor('#D8E9F3'))
         self.setPalette(palette)
 
-        # 📌 Hlavní layout okna
+        # 📌 Main window layout / Hlavní layout okna
         layout = QVBoxLayout()
 
-        # 📌 Logo aplikace
+        # 📌 Application logo / Logo aplikace
         self.logo = QLabel(self)
         pixmap = QPixmap(str(login_logo)).scaled(self.width() - 20, 256, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         self.logo.setPixmap(pixmap)
         self.logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.logo)
 
-        # 📌 Pole pro zadání hesla (ID karta)
+        # 📌 Password field (ID card) / Pole pro zadání hesla (ID karta)
         self.password_input: QLineEdit = QLineEdit()
         self.password_input.setFont(input_font)
-        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)  # ✅ Skryté zadávání hesla
+        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)  # 💡 Hidden password entry / Skryté zadávání hesla
         self.password_input.setPlaceholderText('Naskenujte svoji ID kartu')
         self.password_input.setStyleSheet('background-color: white; padding: 5px; color: black; border-radius: 8px; border: 2px solid #FFC107;')
 
-        # 📌 Nastavení barvy textu pro placeholder
+        # 📌 Set text color for placeholder / Nastavení barvy textu pro placeholder
         self.palette = self.password_input.palette()
-        self.placeholder_color = QColor('#757575')  # ✅ Šedá barva pro placeholder text
+        self.placeholder_color = QColor('#757575')
         self.palette.setColor(QPalette.ColorRole.PlaceholderText, self.placeholder_color)
         self.password_input.setPalette(self.palette)
 
-        # 📌 Nastavení barvy tlačítek
+        # 📌 Setting the colour of the buttons / Nastavení barvy tlačítek
         button_style = """
             QPushButton {
                 background-color: #1976D2;
@@ -97,29 +101,29 @@ class LoginWindow(QWidget):
             }
             """
 
-        # 📌 Tlačítko pro přihlášení
+        # 📌 Login button / Tlačítko pro přihlášení
         self.login_button: QPushButton = QPushButton('Přihlásit se')
         self.login_button.setFont(button_font)
         self.login_button.setStyleSheet(button_style)
 
-        # 📌 Tlačítko pro výběr 'Ukončit'
+        # 📌 Button to select 'Exit' / Tlačítko pro výběr 'Ukončit'
         self.exit_button: QPushButton = QPushButton('Ukončit')
         self.exit_button.setFont(button_font)
         self.exit_button.setStyleSheet(button_style)
 
-        # 📌 Propojení tlačítka s akcí přihlášení
-        self.password_input.returnPressed.connect(self.login_button.click)  # ✅ Enter aktivuje tlačítko
+        # 📌 Enter activates the button / Enter aktivuje tlačítko
+        self.password_input.returnPressed.connect(self.login_button.click)
 
-        # 📌 Přidání prvků do hlavního layoutu
+        # 📌 Adding elements to the main layout / Přidání prvků do hlavního layoutu
         layout.addWidget(self.password_input)
         layout.addWidget(self.login_button)
         layout.addWidget(self.exit_button)
 
-        # 📌 Nastavení layoutu okna
+        # 📌 Window layout settings / Nastavení layoutu okna
         self.setLayout(layout)
 
-        self.activateWindow()  # ✅ Zajistíme, že okno získá prioritu
-        self.raise_()  # ✅ Přivedeme okno do popředí
+        self.activateWindow()  # 💡 We make sure that the window gets priority / Zajistíme, že okno získá prioritu
+        self.raise_()  # 💡 Bring the window to the foreground / Přivedeme okno do popředí
 
-        self.password_input.setFocus()  # 🎯 automaticky umístí kurzor do pole
-        self.effects.fade_in(self, duration=3000)  # 🌟 vizuální animace
+        self.password_input.setFocus()
+        self.effects.fade_in(self, duration=3000)  # 🌟 Visual animation / Vizuální animace
