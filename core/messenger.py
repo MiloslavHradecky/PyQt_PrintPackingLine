@@ -41,28 +41,13 @@ class Messenger:
         :param message: Displayed text / Zpráva
         :param error_code: Optional error ID
         """
-        info_dialog = QMessageBox()
-        info_dialog.setIcon(QMessageBox.Icon.Information)
-        info_dialog.setWindowIcon(QIcon(str(self.info_icon_path)))
-        info_dialog.setWindowTitle(title)
-        info_dialog.setText(f'{message}' if error_code is None else f'[{error_code}]\n{message}')
-        info_dialog.setStandardButtons(QMessageBox.StandardButton.Ok)
-
-        # 📌 Centering the window / Vycentrování okna
-        info_dialog.adjustSize()
-        if self.parent:
-            parent_center = self.parent.geometry().center()
-            dialog_rect = info_dialog.geometry()
-            info_dialog.move(parent_center.x() - dialog_rect.width() // 2,
-                             parent_center.y() - dialog_rect.height() // 2)
-        else:
-            screen = QApplication.primaryScreen()
-            screen_rect = screen.availableGeometry()
-            screen_center = screen_rect.center()
-            dialog_rect = info_dialog.geometry()
-            info_dialog.move(screen_center.x() - dialog_rect.width() // 2,
-                             screen_center.y() - dialog_rect.height() // 2)
-        info_dialog.exec()
+        self._show_dialog(
+            title=title,
+            message=message,
+            error_code=error_code,
+            icon=QMessageBox.Icon.Information,
+            icon_path=self.info_icon_path
+        )
 
     def show_warning(self, title, message, error_code=None):
         """
@@ -73,28 +58,13 @@ class Messenger:
         :param message: Text to display
         :param error_code: Optional error tag
         """
-        warning_dialog = QMessageBox()
-        warning_dialog.setIcon(QMessageBox.Icon.Warning)
-        warning_dialog.setWindowIcon(QIcon(str(self.warning_icon_path)))
-        warning_dialog.setWindowTitle(title)
-        warning_dialog.setText(f'{message}' if error_code is None else f'[{error_code}]\n{message}')
-        warning_dialog.setStandardButtons(QMessageBox.StandardButton.Ok)
-
-        # 📌 Centering the window / Vycentrování okna
-        warning_dialog.adjustSize()
-        if self.parent:
-            parent_center = self.parent.geometry().center()
-            dialog_rect = warning_dialog.geometry()
-            warning_dialog.move(parent_center.x() - dialog_rect.width() // 2,
-                                parent_center.y() - dialog_rect.height() // 2)
-        else:
-            screen = QApplication.primaryScreen()
-            screen_rect = screen.availableGeometry()
-            screen_center = screen_rect.center()
-            dialog_rect = warning_dialog.geometry()
-            warning_dialog.move(screen_center.x() - dialog_rect.width() // 2,
-                                screen_center.y() - dialog_rect.height() // 2)
-        warning_dialog.exec()
+        self._show_dialog(
+            title=title,
+            message=message,
+            error_code=error_code,
+            icon=QMessageBox.Icon.Warning,
+            icon_path=self.warning_icon_path
+        )
 
     def show_error(self, title, message, error_code, exit_on_close: bool = False):
         """
@@ -106,29 +76,43 @@ class Messenger:
         :param error_code: Required ID code
         :param exit_on_close: Whether app should quit after closing
         """
-        error_dialog = QMessageBox()
-        error_dialog.setIcon(QMessageBox.Icon.Critical)
-        error_dialog.setWindowIcon(QIcon(str(self.error_icon_path)))
-        error_dialog.setWindowTitle(title)
-        error_dialog.setText(f'[{error_code}]\n{message}')
-        error_dialog.setStandardButtons(QMessageBox.StandardButton.Ok)
+        result = self._show_dialog(
+            title=title,
+            message=message,
+            error_code=error_code,
+            icon=QMessageBox.Icon.Critical,
+            icon_path=self.error_icon_path
+        )
 
-        # 📌 Centering the window / Vycentrování okna
-        error_dialog.adjustSize()
-        if self.parent:
-            parent_center = self.parent.geometry().center()
-            dialog_rect = error_dialog.geometry()
-            error_dialog.move(parent_center.x() - dialog_rect.width() // 2,
-                              parent_center.y() - dialog_rect.height() // 2)
-        else:
-            screen = QApplication.primaryScreen()
-            screen_rect = screen.availableGeometry()
-            screen_center = screen_rect.center()
-            dialog_rect = error_dialog.geometry()
-            error_dialog.move(screen_center.x() - dialog_rect.width() // 2,
-                              screen_center.y() - dialog_rect.height() // 2)
-
-        # 📌 To view and check whether to quit an application / Zobrazení a kontrola, zda se má ukončit aplikace
-        result = error_dialog.exec()
         if exit_on_close and result == QMessageBox.StandardButton.Ok:
             QApplication.quit()
+
+    def _show_dialog(self, title, message, error_code, icon, icon_path):
+        """
+        Internal shared dialog rendering method.
+        Interní metoda pro vykreslení libovolného dialogu.
+
+        :return: Clicked button (used for exit handling)
+        """
+        dialog = QMessageBox()
+        dialog.setIcon(icon)
+        dialog.setWindowIcon(QIcon(str(icon_path)))
+        dialog.setWindowTitle(title)
+        dialog.setText(f'{message}' if error_code is None else f'[{error_code}]\n{message}')
+        dialog.setStandardButtons(QMessageBox.StandardButton.Ok)
+
+        dialog.adjustSize()
+
+        if self.parent:
+            parent_center = self.parent.geometry().center()
+            dialog_rect = dialog.geometry()
+            dialog.move(parent_center.x() - dialog_rect.width() // 2,
+                        parent_center.y() - dialog_rect.height() // 2)
+        else:
+            screen = QApplication.primaryScreen()
+            screen_center = screen.availableGeometry().center()
+            dialog_rect = dialog.geometry()
+            dialog.move(screen_center.x() - dialog_rect.width() // 2,
+                        screen_center.y() - dialog_rect.height() // 2)
+
+        return dialog.exec()
