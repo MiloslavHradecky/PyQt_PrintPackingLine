@@ -46,7 +46,7 @@ class PrintWindow(QWidget):
         self.setWindowIcon(QIcon(str(icon_print_path)))
 
         # 🔠 Fonts / Definice fontů
-        label_font = QFont('Arial', 12, QFont.Weight.Bold)
+        label_font = QFont('Arial', 11, QFont.Weight.Bold)
         button_font = QFont('Arial', 16, QFont.Weight.Bold)
         input_font = QFont('Arial', 12, QFont.Weight.Bold)
 
@@ -61,6 +61,7 @@ class PrintWindow(QWidget):
         # 📌 Dynamic label with order and product / Dynamický popisek
         self.print_label = QLabel(f'<span style="color: black;">Příkaz:&nbsp;<b><span style="color:#C0392B">{self.order_code}</span></b>&nbsp;&nbsp;&nbsp;<span style="color: black;">Produkt:&nbsp;<b><span style="color:#C0392B">{self.product_name}</span></b>')
         self.print_label.setFont(label_font)
+        self.print_label.setFixedHeight(32)
         self.print_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         # 📌 Logo / Logo aplikace
@@ -118,7 +119,7 @@ class PrintWindow(QWidget):
         # 📌 Enter triggers print / Propojení tlačítka s akcí přihlášení
         self.serial_number_input.returnPressed.connect(self.print_button.click)
 
-        # 📌 Přidání prvků do hlavního layoutu
+        # 📌 Add elements to the main layout / Přidání prvků do hlavního layoutu
         layout.addWidget(self.print_label)
         layout.addWidget(self.logo)
         layout.addWidget(self.serial_number_input)
