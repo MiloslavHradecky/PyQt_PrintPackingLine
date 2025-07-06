@@ -1,3 +1,6 @@
+# 🖨️ PrintWindow – UI for serial number input and print action
+# Uživatelské rozhraní pro zadání výrobního čísla a tisk
+
 from pathlib import Path
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton
@@ -7,18 +10,18 @@ from effects.window_effects_manager import WindowEffectsManager
 
 class PrintWindow(QWidget):
     """
-    Třída představující přihlašovací okno aplikace.
-    - Zobrazuje vstupní pole pro heslo (skrytý text)
-    - Má tlačítko pro potvrzení přihlášení
-    - Propojená s 'ControllerApp', která zpracovává přihlášení
+    Displays information about the work order and product and allows printing.
+    Zobrazuje informace o příkazu a produktu a umožňuje pokračovat tiskem.
     """
 
     def __init__(self, order_code: str, product_name: str, controller=None):
         """
-        Inicializuje 'PrintWindow' a nastaví jeho vizuální vzhled.
-        - Přijímá 'controller', který spravuje logiku přihlášení
-        - Nastavuje ikonu okna
-        - Definuje fonty, barvy a celkové UI rozvržení
+        Initializes the PrintWindow and prepares UI.
+        Inicializuje tiskové okno a připraví rozhraní.
+
+        :param order_code: Code of the active work order / Kód výrobního příkazu
+        :param product_name: Human-readable product name / Název produktu
+        :param controller: Optional controlling logic class
         """
         super().__init__()
 
@@ -28,55 +31,57 @@ class PrintWindow(QWidget):
 
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
-        # 📌 Nastavení názvu a velikosti okna
+        # 🪟 Title and size / Název a rozměry okna
         self.setWindowTitle('Print Line B')
         self.setFixedSize(400, 500)
-
-        self.effects = WindowEffectsManager()
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
 
-        # 📌 Cesty k ikonám
+        self.effects = WindowEffectsManager()
+
+        # 📁 Load icon paths / Načti cesty k ikonám
         base_dir = Path(__file__).parent.parent
         ico_dir = base_dir / 'resources' / 'ico'
-
         icon_print_path = ico_dir / 'print.ico'
         print_logo = ico_dir / 'print.png'
+        self.setWindowIcon(QIcon(str(icon_print_path)))
 
-        # 📌 Nastavení ikony okna
-        self.setWindowIcon(QIcon(str(icon_print_path)))  # ✅ Ikona aplikace
-
-        # 📌 Definice fontů pro UI prvky
+        # 🔠 Fonts / Definice fontů
+        label_font = QFont('Arial', 12, QFont.Weight.Bold)
         button_font = QFont('Arial', 16, QFont.Weight.Bold)
         input_font = QFont('Arial', 12, QFont.Weight.Bold)
 
-        # 📌 Nastavení barvy pozadí okna
+        # 🎨 Background color / Nastavení barvy pozadí okna
         palette = QPalette()
-        palette.setColor(QPalette.ColorRole.Window, QColor('#D8E9F3'))  # ✅ Světle modrá barva pozadí
+        palette.setColor(QPalette.ColorRole.Window, QColor('#D8E9F3'))
         self.setPalette(palette)
 
-        # 📌 Hlavní layout okna
+        # 🧱 Layout definition / Hlavní layout okna
         layout = QVBoxLayout()
 
-        # 📌 Logo aplikace
+        # 📌 Dynamic label with order and product / Dynamický popisek
+        self.print_label = QLabel(f'<span style="color: black;">Příkaz:&nbsp;<b><span style="color:#C0392B">{self.order_code}</span></b>&nbsp;&nbsp;&nbsp;<span style="color: black;">Produkt:&nbsp;<b><span style="color:#C0392B">{self.product_name}</span></b>')
+        self.print_label.setFont(label_font)
+        self.print_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        # 📌 Logo / Logo aplikace
         self.logo = QLabel(self)
         pixmap = QPixmap(str(print_logo)).scaled(self.width() - 20, 256, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         self.logo.setPixmap(pixmap)
         self.logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.logo)
 
-        # 📌 Pole pro zadání hesla (ID karta)
+        # 📌 Serial number input / Vstupní pole pro serial number
         self.serial_number_input: QLineEdit = QLineEdit()
         self.serial_number_input.setFont(input_font)
         self.serial_number_input.setPlaceholderText('Naskenujte serial number')
         self.serial_number_input.setStyleSheet('background-color: white; padding: 5px; color: black; border-radius: 8px; border: 2px solid #FFC107;')
 
-        # 📌 Nastavení barvy textu pro placeholder
+        # 📌 Placeholder color / Nastavení barvy textu pro placeholder
         self.palette = self.serial_number_input.palette()
-        self.placeholder_color = QColor('#757575')  # ✅ Šedá barva pro placeholder text
+        self.placeholder_color = QColor('#757575')
         self.palette.setColor(QPalette.ColorRole.PlaceholderText, self.placeholder_color)
         self.serial_number_input.setPalette(self.palette)
 
-        # 📌 Nastavení barvy tlačítek
+        # 🔘 Button styles / Nastavení barvy tlačítek
         button_style = """
             QPushButton {
                 background-color: #1976D2;
@@ -100,29 +105,31 @@ class PrintWindow(QWidget):
             }
             """
 
-        # 📌 Tlačítko pro přihlášení
+        # 🖨️ Print button / Tlačítko pro přihlášení
         self.print_button: QPushButton = QPushButton('Tisk')
         self.print_button.setFont(button_font)
         self.print_button.setStyleSheet(button_style)
 
-        # 📌 Tlačítko pro výběr 'Ukončit'
+        # ❌ Exit button / Tlačítko pro výběr 'Ukončit'
         self.exit_button: QPushButton = QPushButton('Ukončit')
         self.exit_button.setFont(button_font)
         self.exit_button.setStyleSheet(button_style)
 
-        # 📌 Propojení tlačítka s akcí přihlášení
-        self.serial_number_input.returnPressed.connect(self.print_button.click)  # ✅ Enter aktivuje tlačítko
+        # 📌 Enter triggers print / Propojení tlačítka s akcí přihlášení
+        self.serial_number_input.returnPressed.connect(self.print_button.click)
 
         # 📌 Přidání prvků do hlavního layoutu
+        layout.addWidget(self.print_label)
+        layout.addWidget(self.logo)
         layout.addWidget(self.serial_number_input)
         layout.addWidget(self.print_button)
         layout.addWidget(self.exit_button)
 
-        # 📌 Nastavení layoutu okna
+        # 📦 Finalize layout / Nastavení layoutu okna
         self.setLayout(layout)
+        self.activateWindow()
+        self.raise_()
+        self.serial_number_input.setFocus()
 
-        self.activateWindow()  # ✅ Zajistíme, že okno získá prioritu
-        self.raise_()  # ✅ Přivedeme okno do popředí
-
-        self.serial_number_input.setFocus()  # 🎯 automaticky umístí kurzor do pole
-        self.effects.fade_in(self, duration=3000)  # 🌟 vizuální animace
+        # ✨ Launch animation / Vizuální animace
+        self.effects.fade_in(self, duration=2000)
