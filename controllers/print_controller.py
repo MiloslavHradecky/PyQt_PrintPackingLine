@@ -45,10 +45,10 @@ class PrintController:
 
         return True
 
-    def load_lbl_for_control4(self):
+    def load_file_lbl(self):
         """
-        Loads the .lbl file for Control4 based on order_code and config path.
-        Načte .lbl soubor pro Control4 podle kódu příkazu a cesty z config.ini.
+        Loads the .lbl file based on order_code and config path.
+        Načte .lbl soubor podle kódu příkazu a cesty z config.ini.
 
         :return: List of lines or empty list if not found / Seznam řádků nebo prázdný list
         """
@@ -74,8 +74,62 @@ class PrintController:
             self.messenger.show_error('Error', str(e), 'CTRL403')
             return []
 
+    def control4_save_and_print(self, lbl_lines: list[str]) -> None:
+        """
+        Extracts header and record for the scanned serial number and writes them to Control4 output file.
+        Načte hlavičku a záznam z řádků .lbl pro naskenovaný serial number a zapíše je do výstupního souboru Control4.
+
+        - Hledá řádky začínající na: SERIAL+I= a SERIAL+J= a SERIAL+K=
+        - Pokud najde hlavičku i záznam, zapíše je do výstupního souboru
+
+        :param lbl_lines: List of lines from .lbl file / Seznam řádků ze souboru
+        """
+        # 🧠 Získání vstupu ze scanu
+        base_input = self.print_window.serial_number_input.text().strip().upper()
+        key_i = f'{base_input}I='
+        key_j = f'{base_input}J='
+        key_k = f'{base_input}K='
+
+        header = None
+        record = None
+
+        for line in lbl_lines:
+            if line.startswith(key_j):
+                header = line.split('J=')[1].strip()
+            elif line.startswith(key_k):
+                record = line.split('K=')[1].strip()
+
+        # 🚦 Kontrola nálezů
+        if not header or not record:
+            self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'CTRL405')
+            return
+
+        # 📁 Získání cesty z configu
+        config = ConfigLoader()
+        output_path = config.get_path('output_file_path_c4_product')
+
+        if not output_path:
+            self.messenger.show_error('Error', f'Cesta k výstupnímu souboru Control4 nebyla nalezena.', 'CTRL406')
+            return
+
+        try:
+            # 💾 Zápis hlavičky + záznamu
+            with output_path.open('w') as file:
+                file.write(header + '\n')
+                file.write(record + '\n')
+
+            self.normal_logger.log('Info', f'Control4 záznam uložen.', 'CTRL407')
+
+        except Exception as e:
+            self.messenger.show_error('Error', f'Chyba zápisu {str(e)}', 'CTRL408')
+
     def print_button_click(self):
-        pass
+        if not self.validate_serial_number_input():
+            return
+
+        lbl_lines = self.load_file_lbl()
+        if lbl_lines:
+            self.control4_save_and_print(lbl_lines)
 
     def reset_input_focus(self):
         """
