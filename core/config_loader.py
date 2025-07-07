@@ -22,16 +22,17 @@ class ConfigLoader:
         self.config.optionxform = str  # 🟩 Preserve casing / zachování velikosti písmen
         self.config.read(self.config_path)
 
-    def get_path(self, key: str, fallback: str = None) -> Path | None:
+    def get_path(self, key: str, fallback: str = None, section: str = 'Paths') -> Path | None:
         """
-        Returns a resolved Path from the [Paths] section.
-        Vrací absolutní cestu z [Paths] sekce podle klíče.
+        Returns a resolved Path from the specified section.
+        Vrací absolutní cestu ze zadané sekce podle klíče.
 
-        :param key: Key in the [Paths] section / Název klíče
-        :param fallback: Default if key not found / Náhradní hodnota
+        :param key: Key name / Název klíče
+        :param fallback: Default value if key not found / Výchozí hodnota
+        :param section: Name of section to search (default is "Paths") / Název sekce (výchozí je "Paths")
         :return: Resolved Path object or None
         """
-        raw = self.config.get('Paths', key, fallback=fallback)
+        raw = self.config.get(section, key, fallback=fallback)
         return Path(raw).resolve() if raw else None
 
     def get_trigger_values(self, section: str, trigger_name: str) -> list[str]:

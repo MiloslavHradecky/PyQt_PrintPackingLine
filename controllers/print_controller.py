@@ -106,7 +106,8 @@ class PrintController:
 
         # 📁 Získání cesty z configu
         config = ConfigLoader()
-        output_path = config.get_path('output_file_path_c4_product')
+        output_path = config.get_path('output_file_path_c4_product', section='Control4Paths')
+        print(output_path)
 
         if not output_path:
             self.messenger.show_error('Error', f'Cesta k výstupnímu souboru Control4 nebyla nalezena.', 'CTRL406')
