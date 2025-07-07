@@ -2,7 +2,6 @@
 # Řídí logiku vstupu serial number, validaci a spuštění tisku
 
 import re
-from pathlib import Path
 from core.logger import Logger
 from core.messenger import Messenger
 from views.print_window import PrintWindow
@@ -58,6 +57,7 @@ class PrintController:
 
         if not orders_path:
             self.messenger.show_error('Error', 'Konfigurační cesta "orders_path" nebyla nalezena.', 'CTRL401')
+            self.reset_input_focus()
             return []
 
         # 🧩 Sestavení cesty k .lbl souboru
@@ -65,6 +65,7 @@ class PrintController:
 
         if not lbl_file.exists():
             self.messenger.show_info('Warning', f'Soubor {lbl_file} neexistuje.', 'CTRL402')
+            self.reset_input_focus()
             return []
 
         try:
@@ -72,6 +73,7 @@ class PrintController:
             return lbl_file.read_text().splitlines()
         except Exception as e:
             self.messenger.show_error('Error', str(e), 'CTRL403')
+            self.reset_input_focus()
             return []
 
     def control4_save_and_print(self, lbl_lines: list[str]) -> None:
@@ -102,6 +104,7 @@ class PrintController:
         # 🚦 Kontrola nálezů
         if not header or not record:
             self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'CTRL405')
+            self.reset_input_focus()
             return
 
         # 📁 Získání cesty z configu
@@ -110,6 +113,7 @@ class PrintController:
 
         if not output_path:
             self.messenger.show_error('Error', f'Cesta k výstupnímu souboru Control4 nebyla nalezena.', 'CTRL406')
+            self.reset_input_focus()
             return
 
         try:
@@ -125,6 +129,7 @@ class PrintController:
 
             if not trigger_dir or not trigger_dir.exists():
                 self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'CTRL409')
+                self.reset_input_focus()
                 return
 
             # 🔎 Najdeme řádek s I= prefixem
@@ -142,12 +147,15 @@ class PrintController:
                             target_file.touch(exist_ok=True)
 
                     self.normal_logger.log('Info', f'Vytvořeno {len(trigger_values)} trigger souborů ve složce "{trigger_dir}".', 'CTRL410')
+                    self.reset_input_focus()
 
                 except Exception as e:
                     self.messenger.show_error('Error', f'Chyba při tvorbě souborů z I= {str(e)}', 'CTRL411')
+                    self.reset_input_focus()
 
         except Exception as e:
             self.messenger.show_error('Error', f'Chyba zápisu {str(e)}', 'CTRL408')
+            self.reset_input_focus()
 
     def print_button_click(self):
         if not self.validate_serial_number_input():
