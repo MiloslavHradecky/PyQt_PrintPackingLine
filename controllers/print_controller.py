@@ -108,32 +108,6 @@ class PrintController:
         config = ConfigLoader()
         output_path = config.get_path('output_file_path_c4_product', section='Control4Paths')
 
-        # 🗂️ Získání trigger_path z config.ini
-        trigger_dir = config.get_path('trigger_path', section='Paths')
-
-        if not trigger_dir or not trigger_dir.exists():
-            self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'CTRL409')
-            return
-
-        # 🔎 Najdeme řádek s I= prefixem
-        trigger_line = next((line for line in lbl_lines if line.startswith(key_i)), None)
-
-        if trigger_line:
-            try:
-                # ✂️ Rozdělení a vytvoření souborů podle hodnot
-                trigger_values = trigger_line.split('I=')[1].strip().split(';')
-
-                for value in trigger_values:
-                    name = value.strip()
-                    if name:
-                        target_file = trigger_dir / name  # ⚠️ Bez přípony!
-                        target_file.touch(exist_ok=True)
-
-                self.normal_logger.log('Info', f'Vytvořeno {len(trigger_values)} trigger souborů ve složce "{trigger_dir}".', 'CTRL410')
-
-            except Exception as e:
-                self.messenger.show_error('Error', f'Chyba při tvorbě souborů z I= {str(e)}', 'CTRL411')
-
         if not output_path:
             self.messenger.show_error('Error', f'Cesta k výstupnímu souboru Control4 nebyla nalezena.', 'CTRL406')
             return
@@ -145,6 +119,32 @@ class PrintController:
                 file.write(record + '\n')
 
             self.normal_logger.log('Info', f'Control4 záznam uložen.', 'CTRL407')
+
+            # 🗂️ Získání trigger_path z config.ini
+            trigger_dir = config.get_path('trigger_path', section='Paths')
+
+            if not trigger_dir or not trigger_dir.exists():
+                self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'CTRL409')
+                return
+
+            # 🔎 Najdeme řádek s I= prefixem
+            trigger_line = next((line for line in lbl_lines if line.startswith(key_i)), None)
+
+            if trigger_line:
+                try:
+                    # ✂️ Rozdělení a vytvoření souborů podle hodnot
+                    trigger_values = trigger_line.split('I=')[1].strip().split(';')
+
+                    for value in trigger_values:
+                        name = value.strip()
+                        if name:
+                            target_file = trigger_dir / name  # ⚠️ Bez přípony!
+                            target_file.touch(exist_ok=True)
+
+                    self.normal_logger.log('Info', f'Vytvořeno {len(trigger_values)} trigger souborů ve složce "{trigger_dir}".', 'CTRL410')
+
+                except Exception as e:
+                    self.messenger.show_error('Error', f'Chyba při tvorbě souborů z I= {str(e)}', 'CTRL411')
 
         except Exception as e:
             self.messenger.show_error('Error', f'Chyba zápisu {str(e)}', 'CTRL408')
