@@ -54,7 +54,7 @@ class PrintController:
         """
         # 🎯 Získání cesty z config.ini
         config = ConfigLoader()
-        orders_path = config.get_path('orders_path')
+        orders_path = config.get_path('orders_path', section='Paths')
 
         if not orders_path:
             self.messenger.show_error('Error', 'Konfigurační cesta "orders_path" nebyla nalezena.', 'CTRL401')
