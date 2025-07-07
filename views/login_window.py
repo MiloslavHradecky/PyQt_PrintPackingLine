@@ -1,3 +1,6 @@
+# 🔐 LoginWindow – GUI login screen with password entry for ID card systems
+# Přihlašovací okno aplikace s polem pro ID kartu a animovaným vzhledem
+
 from pathlib import Path
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton
