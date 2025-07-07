@@ -1,3 +1,6 @@
+# 🔐 Utility module for decrypting user credentials via SZV.dat
+# Pomocný modul pro dekódování přihlašovacích údajů ze souboru SZV.dat
+
 import hashlib
 import configparser
 from core.logger import Logger

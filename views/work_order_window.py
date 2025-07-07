@@ -1,3 +1,6 @@
+# 📋 WorkOrderWindow – User interface for scanning work order codes
+# Uživatelské rozhraní pro zadání výrobního příkazu
+
 from pathlib import Path
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton

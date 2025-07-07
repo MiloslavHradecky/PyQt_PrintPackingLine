@@ -1,5 +1,5 @@
 # 🪟 WindowStackManager – simple navigation stack for multi-window flow
-# 🪟 Správce zásobníku oken pro přepínání mezi jednotlivými obrazovkami
+# Správce zásobníku oken pro přepínání mezi jednotlivými obrazovkami
 
 class WindowStackManager:
     def __init__(self):

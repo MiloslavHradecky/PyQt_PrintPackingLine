@@ -1,3 +1,6 @@
+# 🧭 WorkOrderController – Manages scanning logic and transitions to printing
+# Řídící třída pro zadání pracovního příkazu a přechod na tisk
+
 from pathlib import Path
 from core.logger import Logger
 from core.messenger import Messenger

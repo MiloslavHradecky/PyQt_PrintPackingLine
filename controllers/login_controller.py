@@ -1,3 +1,6 @@
+# 🎛️ LoginController – handles login logic and post-authentication navigation
+# Třída LoginController zajišťuje ověření hesla a přechod do další části aplikace
+
 import utils.szv_utils
 from core.logger import Logger
 from core.messenger import Messenger
