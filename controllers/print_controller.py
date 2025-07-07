@@ -69,7 +69,7 @@ class PrintController:
 
         try:
             # 📄 Načtení obsahu souboru
-            return lbl_file.read_text(encoding='utf-8').splitlines()
+            return lbl_file.read_text().splitlines()
         except Exception as e:
             self.messenger.show_error('Error', str(e), 'CTRL403')
             return []
