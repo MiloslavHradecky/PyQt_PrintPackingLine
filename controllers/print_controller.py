@@ -37,6 +37,14 @@ class PrintController:
         """
         return self.print_window.serial_number_input.text().strip().upper()
 
+    @property
+    def product_name(self) -> str:
+        """
+        Returns cleaned product name from print window.
+        Vrací očištěný název produktu z print window.
+        """
+        return self.print_window.product_name.strip().upper()
+
     def get_trigger_dir(self) -> Path | None:
         """
         Returns trigger directory path from config.
@@ -349,7 +357,7 @@ class PrintController:
 
         :return: List of matching group names / Seznam shodných skupin
         """
-        product_name = self.print_window.product_name.strip().upper()
+        product_name = self.product_name
 
         matching = []
         for section_key in self.config.config.options('ProductTriggerMapping'):
