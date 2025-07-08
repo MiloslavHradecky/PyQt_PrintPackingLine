@@ -258,7 +258,7 @@ class PrintController:
         # ✂️ Příprava názvu souboru z hodnot
         base_code = parts[1] + parts[2]
         file_name = f'{base_code}.{parts[0]}'
-        subdir1 = parts[2][:2] + parts[0]  # 0036 + 54 = 2054
+        subdir1 = f'20{parts[0]}'  # 0036 + 54 = 2054
         subdir2 = parts[1]  # 4205
 
         # 📁 Získání cesty z configu
