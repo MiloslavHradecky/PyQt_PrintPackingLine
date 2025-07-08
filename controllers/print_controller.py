@@ -147,7 +147,6 @@ class PrintController:
                             target_file.touch(exist_ok=True)
 
                     self.normal_logger.log('Info', f'Vytvořeno {len(trigger_values)} trigger souborů ve složce "{trigger_dir}".', 'CTRL410')
-                    self.reset_input_focus()
 
                 except Exception as e:
                     self.messenger.show_error('Error', f'Chyba při tvorbě souborů z I= {str(e)}', 'CTRL411')
@@ -228,7 +227,6 @@ class PrintController:
                             target_file.touch(exist_ok=True)
 
                     self.normal_logger.log('Info', f'Vytvořeno {len(trigger_values)} trigger souborů ve složce "{trigger_dir}".', 'CTRL410')
-                    self.reset_input_focus()
 
                 except Exception as e:
                     self.messenger.show_error('Error', f'Chyba při tvorbě souborů z B= {str(e)}', 'CTRL411')
@@ -251,9 +249,9 @@ class PrintController:
         serial_number = self.print_window.serial_number_input.text().strip().upper()
         parts = serial_number.split('-')
 
-        if len(parts) != 3 or not all(part.isdigit() for part in parts):
-            self.messenger.show_warning('Warning', f'Serial number musí být typu 00-0000-0000.', 'MY2N001')
-            return
+        # if len(parts) != 3 or not all(part.isdigit() for part in parts):
+        #     self.messenger.show_warning('Warning', f'Serial number musí být typu 00-0000-0000.', 'MY2N001')
+        #     return
 
         # ✂️ Příprava názvu souboru z hodnot
         base_code = parts[1] + parts[2]
@@ -305,17 +303,60 @@ class PrintController:
 
             self.normal_logger.log('Info', f'My2N token uložen: {token}', 'MY2N007')
 
+            # 🗂️ Vytvoření trigger souboru SF_MY2N_A
+            trigger_dir = config.get_path('trigger_path', section='Paths')
+
+            if trigger_dir and trigger_dir.exists():
+                try:
+                    trigger_file = trigger_dir / 'SF_MY2N_A'  # ⚠️ bez přípony!
+                    trigger_file.touch(exist_ok=True)
+
+                    self.normal_logger.log('Info', 'Trigger soubor SF_MY2N_A vytvořen.', 'MY2N009')
+                except Exception as e:
+                    self.messenger.show_error('Chyba trigger souboru', f'Chyba trigger souboru {str(e)}', 'MY2N010')
+            else:
+                self.messenger.show_warning(
+                    'Trigger cesta nenalezena',
+                    'Složka "trigger_path" není definována nebo neexistuje.',
+                    'MY2N011'
+                )
+
         except Exception as e:
             self.messenger.show_error('Error', f'Chyba zápisu {str(e)}', 'MY2N008')
+
+    def get_trigger_groups_for_product(self) -> list[str]:
+        """
+        Returns all trigger groups (product, control4, my2n) that match product_name from config.
+        Vrátí všechny skupiny (product, control4, my2n), které obsahují zadaný produkt z configu.
+
+        :return: List of matching group names / Seznam shodných skupin
+        """
+        config = ConfigLoader()
+        product_name = self.print_window.product_name.strip().upper()
+
+        matching = []
+        for section_key in config.config.options('ProductTriggerMapping'):
+            raw_list = config.config.get('ProductTriggerMapping', section_key)
+            items = [i.strip() for i in raw_list.split(',')]
+            if product_name in items:
+                matching.append(section_key)
+
+        return matching  # e.g. ['product', 'my2n']
 
     def print_button_click(self):
         if not self.validate_serial_number_input():
             return
-        self.my2n_save_and_print()
-        # lbl_lines = self.load_file_lbl()
-        # if lbl_lines:
-        #     # self.control4_save_and_print(lbl_lines)
-        #     self.product_save_and_print(lbl_lines)
+        triggers = self.get_trigger_groups_for_product()
+        lbl_lines = self.load_file_lbl()
+
+        if 'product' in triggers and lbl_lines:
+            self.product_save_and_print(lbl_lines)
+
+        if 'control4' in triggers and lbl_lines:
+            self.control4_save_and_print(lbl_lines)
+
+        if 'my2n' in triggers:
+            self.my2n_save_and_print()
 
     def reset_input_focus(self):
         """
