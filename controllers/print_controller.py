@@ -2,6 +2,7 @@
 # Řídí logiku vstupu serial number, validaci a spuštění tisku
 
 import re
+from pathlib import Path
 from core.logger import Logger
 from core.messenger import Messenger
 from views.print_window import PrintWindow
@@ -18,6 +19,7 @@ class PrintController:
         self.print_window = PrintWindow(order_code, product_name, controller=self)
 
         self.messenger = Messenger()
+        self.config = ConfigLoader()
 
         # 📝 Logging setup / Nastavení loggeru
         self.normal_logger = Logger(spaced=False)
@@ -27,6 +29,24 @@ class PrintController:
         self.print_window.print_button.clicked.connect(self.print_button_click)
         self.print_window.exit_button.clicked.connect(self.handle_exit)
 
+    @property
+    def serial_input(self) -> str:
+        """
+        Returns cleaned serial number from input field.
+        Vrací očištěný serial number ze vstupního pole.
+        """
+        return self.print_window.serial_number_input.text().strip().upper()
+
+    def get_trigger_dir(self) -> Path | None:
+        """
+        Returns trigger directory path from config.
+        Vrací cestu ke složce trigger souborů z config.ini.
+        """
+        path = self.config.get_path('trigger_path', section='Paths')
+        if path and path.exists():
+            return path
+        return None
+
     def validate_serial_number_input(self) -> bool:
         """
         Validates the entered serial number against expected format.
@@ -34,7 +54,7 @@ class PrintController:
 
         :return: True if input is valid, else False
         """
-        input_value = self.print_window.serial_number_input.text().strip().upper()
+        input_value = self.serial_input
 
         pattern = r'^\d{2}-\d{4}-\d{4}$'
         if not re.fullmatch(pattern, input_value):
@@ -52,8 +72,7 @@ class PrintController:
         :return: List of lines or empty list if not found / Seznam řádků nebo prázdný list
         """
         # 🎯 Získání cesty z config.ini
-        config = ConfigLoader()
-        orders_path = config.get_path('orders_path', section='Paths')
+        orders_path = self.config.get_path('orders_path', section='Paths')
 
         if not orders_path:
             self.messenger.show_error('Error', 'Konfigurační cesta "orders_path" nebyla nalezena.', 'CTRL401')
@@ -87,7 +106,7 @@ class PrintController:
         :param lbl_lines: List of lines from .lbl file / Seznam řádků ze souboru
         """
         # 🧠 Získání vstupu ze scanu
-        base_input = self.print_window.serial_number_input.text().strip().upper()
+        base_input = self.serial_input
         key_i = f'{base_input}I='
         key_j = f'{base_input}J='
         key_k = f'{base_input}K='
@@ -108,8 +127,7 @@ class PrintController:
             return
 
         # 📁 Získání cesty z configu
-        config = ConfigLoader()
-        output_path = config.get_path('output_file_path_c4_product', section='Control4Paths')
+        output_path = self.config.get_path('output_file_path_c4_product', section='Control4Paths')
 
         if not output_path:
             self.messenger.show_error('Error', f'Cesta k výstupnímu souboru Control4 nebyla nalezena.', 'CTRL406')
@@ -125,7 +143,7 @@ class PrintController:
             self.normal_logger.log('Info', f'Control4 záznam uložen.', 'CTRL407')
 
             # 🗂️ Získání trigger_path z config.ini
-            trigger_dir = config.get_path('trigger_path', section='Paths')
+            trigger_dir = self.get_trigger_dir()
 
             if not trigger_dir or not trigger_dir.exists():
                 self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'CTRL409')
@@ -138,7 +156,8 @@ class PrintController:
             if trigger_line:
                 try:
                     # ✂️ Rozdělení a vytvoření souborů podle hodnot
-                    trigger_values = trigger_line.split('I=')[1].strip().split(';')
+                    raw_value = trigger_line.split('I=')[1]
+                    trigger_values = [val.strip() for val in raw_value.split(';') if val.strip()]
 
                     for value in trigger_values:
                         name = value.strip()
@@ -167,7 +186,7 @@ class PrintController:
         :param lbl_lines: List of lines from .lbl file / Seznam řádků ze souboru
         """
         # 🧠 Získání vstupu ze scanu
-        base_input = self.print_window.serial_number_input.text().strip().upper()
+        base_input = self.serial_input
         key_b = f'{base_input}B='
         key_d = f'{base_input}D='
         key_e = f'{base_input}E='
@@ -188,8 +207,7 @@ class PrintController:
             return
 
         # 📁 Získání cesty z configu
-        config = ConfigLoader()
-        output_path = config.get_path('output_file_path_product', section='ProductPaths')
+        output_path = self.config.get_path('output_file_path_product', section='ProductPaths')
 
         if not output_path:
             self.messenger.show_error('Error', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'CTRL406')
@@ -205,7 +223,7 @@ class PrintController:
             self.normal_logger.log('Info', f'Product záznam uložen.', 'CTRL407')
 
             # 🗂️ Získání trigger_path z config.ini
-            trigger_dir = config.get_path('trigger_path', section='Paths')
+            trigger_dir = self.get_trigger_dir()
 
             if not trigger_dir or not trigger_dir.exists():
                 self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'CTRL409')
@@ -218,7 +236,8 @@ class PrintController:
             if trigger_line:
                 try:
                     # ✂️ Rozdělení a vytvoření souborů podle hodnot
-                    trigger_values = trigger_line.split('B=')[1].strip().split(';')
+                    raw_value = trigger_line.split('B=')[1]
+                    trigger_values = [val.strip() for val in raw_value.split(';') if val.strip()]
 
                     for value in trigger_values:
                         name = value.strip()
@@ -246,7 +265,7 @@ class PrintController:
         - Vytvoří výstupní soubor s hlavičkou a hodnotami
         """
         # 🧠 Načtení serial number z inputu
-        serial_number = self.print_window.serial_number_input.text().strip().upper()
+        serial_number = self.serial_input
         parts = serial_number.split('-')
 
         # if len(parts) != 3 or not all(part.isdigit() for part in parts):
@@ -260,9 +279,8 @@ class PrintController:
         subdir2 = parts[1]  # 4205
 
         # 📁 Získání cesty z configu
-        config = ConfigLoader()
-        reports_path = config.get_path('reports_path', section='Paths')
-        output_path = config.get_path('output_file_path_my2n', section='My2nPaths')
+        reports_path = self.config.get_path('reports_path', section='Paths')
+        output_path = self.config.get_path('output_file_path_my2n', section='My2nPaths')
 
         if not reports_path or not output_path:
             self.messenger.show_error('Error', f'Cesty nejsou definovány v config.ini.', 'MY2N002')
@@ -304,7 +322,7 @@ class PrintController:
             self.normal_logger.log('Info', f'My2N token uložen: {token}', 'MY2N007')
 
             # 🗂️ Vytvoření trigger souboru SF_MY2N_A
-            trigger_dir = config.get_path('trigger_path', section='Paths')
+            trigger_dir = self.get_trigger_dir()
 
             if trigger_dir and trigger_dir.exists():
                 try:
@@ -331,12 +349,11 @@ class PrintController:
 
         :return: List of matching group names / Seznam shodných skupin
         """
-        config = ConfigLoader()
         product_name = self.print_window.product_name.strip().upper()
 
         matching = []
-        for section_key in config.config.options('ProductTriggerMapping'):
-            raw_list = config.config.get('ProductTriggerMapping', section_key)
+        for section_key in self.config.config.options('ProductTriggerMapping'):
+            raw_list = self.config.config.get('ProductTriggerMapping', section_key)
             items = [i.strip() for i in raw_list.split(',')]
             if product_name in items:
                 matching.append(section_key)
@@ -357,6 +374,8 @@ class PrintController:
 
         if 'my2n' in triggers:
             self.my2n_save_and_print()
+
+        self.reset_input_focus()
 
     def reset_input_focus(self):
         """
