@@ -292,79 +292,82 @@ class PrintController:
         - Hledá poslední řádek obsahující 'My2N token:'
         - Vytvoří výstupní soubor s hlavičkou a hodnotami
         """
-        # 🧠 Načtení serial number z inputu
+        # 🧠 Loading serial number from input / Načtení serial number z inputu
         serial_number = self.serial_input
         parts = serial_number.split('-')
 
-        # ✂️ Příprava názvu souboru z hodnot
+        # ✂️ Preparing a file name from values / Příprava názvu souboru z hodnot
         base_code = parts[1] + parts[2]
         file_name = f'{base_code}.{parts[0]}'
         subdir1 = f'20{parts[0]}'  # 0036 + 54 = 2054
         subdir2 = parts[1]  # 4205
 
-        # 📁 Získání cesty z configu
+        # 📁 Getting the path from config / Získání cesty z configu
         reports_path = self.config.get_path('reports_path', section='Paths')
         output_path = self.config.get_path('output_file_path_my2n', section='My2nPaths')
 
         if not reports_path or not output_path:
-            self.messenger.show_error('Error', f'Cesty nejsou definovány v config.ini.', 'MY2N002')
+            self.normal_logger.log('Error', f'Cesty nejsou definovány v config.ini.', 'PRICON014')
+            self.messenger.show_error('Error', f'Cesty nejsou definovány v config.ini.', 'PRICON014', False)
             return
 
-        # 🧩 Finální cesta ke vstupnímu souboru
+        # 🧩 Final path to the input file / Finální cesta ke vstupnímu souboru
         source_file = reports_path / subdir1 / subdir2 / file_name
 
         if not source_file.exists():
-            self.messenger.show_info('Info', f'Report soubor {source_file} neexistuje.', 'MY2N003')
+            self.normal_logger.log('Info', f'Report soubor {source_file} neexistuje.', 'PRICON015')
+            self.messenger.show_info('Info', f'Report soubor {source_file} neexistuje.', 'PRICON015')
             return
 
         try:
             lines = source_file.read_text().splitlines()
         except Exception as e:
-            self.messenger.show_error('Error', f'Chyba čtení {str(e)}', 'MY2N004')
+            self.normal_logger.log('Error', f'Chyba čtení {str(e)}', 'PRICON016')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON016', False)
             return
 
-        # 🔎 Najdeme poslední výskyt "My2N token:"
+        # 🔎 We find the last occurrence of "My2N token:" / Najdeme poslední výskyt "My2N token:"
         token_line = next((line for line in reversed(lines) if 'My2N token:' in line), None)
 
         if not token_line:
-            self.messenger.show_warning('Token nenalezen', 'V souboru nebyl nalezen žádný My2N token.', 'MY2N005')
+            self.normal_logger.log('Warning', f'V souboru nebyl nalezen žádný My2N token.', 'PRICON017')
+            self.messenger.show_warning('Warning', f'V souboru nebyl nalezen žádný My2N token.', 'PRICON017')
             return
 
-        # ✂️ Extrakce tokenu
+        # ✂️ Token extraction / Extrakce tokenu
         try:
             token = token_line.split('My2N token:')[1].strip()
         except Exception as e:
-            self.messenger.show_error('Error', f'Chyba extrakce {str(e)}', 'MY2N006')
+            self.normal_logger.log('Error', f'Chyba extrakce {str(e)}', 'PRICON018')
+            self.messenger.show_error('Error', f'Chyba extrakce {str(e)}', 'PRICON018', False)
             return
 
-        # 📄 Zápis do výstupního souboru
+        # 📄 Write to output file / Zápis do výstupního souboru
         try:
             with output_path.open('w') as file:
                 file.write('"L Vyrobni cislo dlouhe","L Bezpecnostni cislo","P Vyrobni cislo","P Bezpecnostni kod"\n')
                 file.write(f'"Serial number:","My2N Security Code:","{serial_number}","{token}"\n')
 
-            self.normal_logger.log('Info', f'My2N token uložen: {token}', 'MY2N007')
+            self.normal_logger.clear_log('Info', f'My2N token uložen: {token}')
 
-            # 🗂️ Vytvoření trigger souboru SF_MY2N_A
+            # 🗂️ Creating trigger file SF_MY2N_A / Vytvoření trigger souboru SF_MY2N_A
             trigger_dir = self.get_trigger_dir()
 
             if trigger_dir and trigger_dir.exists():
                 try:
-                    trigger_file = trigger_dir / 'SF_MY2N_A'  # ⚠️ bez přípony!
+                    trigger_file = trigger_dir / 'SF_MY2N_A'
                     trigger_file.touch(exist_ok=True)
 
-                    self.normal_logger.log('Info', 'Trigger soubor SF_MY2N_A vytvořen.', 'MY2N009')
                 except Exception as e:
-                    self.messenger.show_error('Chyba trigger souboru', f'Chyba trigger souboru {str(e)}', 'MY2N010')
+                    self.normal_logger.log('Error', f'Chyba trigger souboru {str(e)}', 'PRICON019')
+                    self.messenger.show_error('Error', f'Chyba trigger souboru {str(e)}', 'PRICON019', False)
             else:
-                self.messenger.show_warning(
-                    'Trigger cesta nenalezena',
-                    'Složka "trigger_path" není definována nebo neexistuje.',
-                    'MY2N011'
-                )
+                self.normal_logger.log('Warning', f'Složka "trigger_path" není definována nebo neexistuje.', 'PRICON020')
+                self.messenger.show_warning('Warning', f'Složka "trigger_path" není definována nebo neexistuje.', 'PRICON020')
 
         except Exception as e:
-            self.messenger.show_error('Error', f'Chyba zápisu {str(e)}', 'MY2N008')
+            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON021')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON021', False)
 
     def get_trigger_groups_for_product(self) -> list[str]:
         """
