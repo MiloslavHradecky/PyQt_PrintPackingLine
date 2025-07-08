@@ -276,10 +276,6 @@ class PrintController:
         serial_number = self.serial_input
         parts = serial_number.split('-')
 
-        # if len(parts) != 3 or not all(part.isdigit() for part in parts):
-        #     self.messenger.show_warning('Warning', f'Serial number musí být typu 00-0000-0000.', 'MY2N001')
-        #     return
-
         # ✂️ Příprava názvu souboru z hodnot
         base_code = parts[1] + parts[2]
         file_name = f'{base_code}.{parts[0]}'
@@ -369,11 +365,22 @@ class PrintController:
         return matching  # e.g. ['product', 'my2n']
 
     def print_button_click(self):
+        """
+        Handles print button action by validating input and triggering appropriate save-and-print methods.
+        Obsluhuje kliknutí na tlačítko 'Print' validací vstupu a spuštěním příslušných metod podle konfigurace.
+        """
+
+        # === 1️⃣ Validate serial number input / Validace vstupu
         if not self.validate_serial_number_input():
             return
+
+        # === 2️⃣ Resolve product trigger groups from config / Načtení skupin produktů podle konfigurace
         triggers = self.get_trigger_groups_for_product()
+
+        # === 3️⃣ Load corresponding .lbl file lines / Načtení řádků ze souboru .lbl
         lbl_lines = self.load_file_lbl()
 
+        # === 4️⃣ Execute save-and-print functions as needed / Spuštění odpovídajících funkcí
         if 'product' in triggers and lbl_lines:
             self.product_save_and_print(lbl_lines)
 
@@ -383,6 +390,7 @@ class PrintController:
         if 'my2n' in triggers:
             self.my2n_save_and_print()
 
+        # === 5️⃣ Refresh input field after action / Vyčištění vstupního pole po dokončení
         self.reset_input_focus()
 
     def reset_input_focus(self):
