@@ -406,6 +406,8 @@ class PrintController:
         # === 4️⃣ Execute save-and-print functions as needed / Spuštění odpovídajících funkcí
         if 'product' in triggers and lbl_lines:
             self.product_save_and_print(lbl_lines)
+            self.normal_logger.clear_log('Info', f'{self.product_name}')
+            self.normal_logger.clear_log('Info', f'{self.serial_input}')
 
         if 'control4' in triggers and lbl_lines:
             self.control4_save_and_print(lbl_lines)
