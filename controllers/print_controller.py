@@ -213,7 +213,7 @@ class PrintController:
                 self.reset_input_focus()
                 return
 
-            # 🔎 Najdeme řádek s I= prefixem
+            # 🔎 Najdeme řádek s B= prefixem
             trigger_line = next((line for line in lbl_lines if line.startswith(key_b)), None)
 
             if trigger_line:
@@ -238,14 +238,84 @@ class PrintController:
             self.messenger.show_error('Error', f'Chyba zápisu {str(e)}', 'CTRL408')
             self.reset_input_focus()
 
+    def my2n_save_and_print(self) -> None:
+        """
+        Extracts My2N token from related report file and writes it into structured output file.
+        Načte My2N token ze souboru na základě serial number a uloží jej do výstupního souboru.
+
+        - Cesta k reportu: reports_path / {2054}/{4205}/{42050036.54}
+        - Hledá poslední řádek obsahující 'My2N token:'
+        - Vytvoří výstupní soubor s hlavičkou a hodnotami
+        """
+        # 🧠 Načtení serial number z inputu
+        serial_number = self.print_window.serial_number_input.text().strip().upper()
+        parts = serial_number.split('-')
+
+        if len(parts) != 3 or not all(part.isdigit() for part in parts):
+            self.messenger.show_warning('Warning', f'Serial number musí být typu 00-0000-0000.', 'MY2N001')
+            return
+
+        # ✂️ Příprava názvu souboru z hodnot
+        base_code = parts[1] + parts[2]
+        file_name = f'{base_code}.{parts[0]}'
+        subdir1 = parts[2][:2] + parts[0]  # 0036 + 54 = 2054
+        subdir2 = parts[1]  # 4205
+
+        # 📁 Získání cesty z configu
+        config = ConfigLoader()
+        reports_path = config.get_path('reports_path', section='Paths')
+        output_path = config.get_path('output_file_path_my2n', section='My2nPaths')
+
+        if not reports_path or not output_path:
+            self.messenger.show_error('Error', f'Cesty nejsou definovány v config.ini.', 'MY2N002')
+            return
+
+        # 🧩 Finální cesta ke vstupnímu souboru
+        source_file = reports_path / subdir1 / subdir2 / file_name
+
+        if not source_file.exists():
+            self.messenger.show_info('Info', f'Report soubor {source_file} neexistuje.', 'MY2N003')
+            return
+
+        try:
+            lines = source_file.read_text().splitlines()
+        except Exception as e:
+            self.messenger.show_error('Error', f'Chyba čtení {str(e)}', 'MY2N004')
+            return
+
+        # 🔎 Najdeme poslední výskyt "My2N token:"
+        token_line = next((line for line in reversed(lines) if 'My2N token:' in line), None)
+
+        if not token_line:
+            self.messenger.show_warning('Token nenalezen', 'V souboru nebyl nalezen žádný My2N token.', 'MY2N005')
+            return
+
+        # ✂️ Extrakce tokenu
+        try:
+            token = token_line.split('My2N token:')[1].strip()
+        except Exception as e:
+            self.messenger.show_error('Error', f'Chyba extrakce {str(e)}', 'MY2N006')
+            return
+
+        # 📄 Zápis do výstupního souboru
+        try:
+            with output_path.open('w') as file:
+                file.write('"L Vyrobni cislo dlouhe","L Bezpecnostni cislo","P Vyrobni cislo","P Bezpecnostni kod"\n')
+                file.write(f'"Serial number:","My2N Security Code:","{serial_number}","{token}"\n')
+
+            self.normal_logger.log('Info', f'My2N token uložen: {token}', 'MY2N007')
+
+        except Exception as e:
+            self.messenger.show_error('Error', f'Chyba zápisu {str(e)}', 'MY2N008')
+
     def print_button_click(self):
         if not self.validate_serial_number_input():
             return
-
-        lbl_lines = self.load_file_lbl()
-        if lbl_lines:
-            # self.control4_save_and_print(lbl_lines)
-            self.product_save_and_print(lbl_lines)
+        self.my2n_save_and_print()
+        # lbl_lines = self.load_file_lbl()
+        # if lbl_lines:
+        #     # self.control4_save_and_print(lbl_lines)
+        #     self.product_save_and_print(lbl_lines)
 
     def reset_input_focus(self):
         """
