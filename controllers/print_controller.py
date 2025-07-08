@@ -10,6 +10,21 @@ from core.config_loader import ConfigLoader
 
 
 class PrintController:
+    """
+    Main logic controller for print operations in the application.
+    Hlavní řídicí třída pro tiskové operace v aplikaci.
+
+    - Handles serial number validation, .lbl file parsing, and configuration-based output decisions
+    - Manages dynamic printing for multiple product types based on config-defined mappings
+    - Generates structured text files and trigger signals for label printing systems
+    - Operates with PrintWindow GUI and connects button actions to appropriate processing
+
+    - Řídí validaci sériových čísel, parsování .lbl souborů a rozhodování podle konfigurace
+    - Obsluhuje dynamické tisky pro různé typy produktů dle mapování v config.ini
+    - Generuje strukturované výstupní soubory i spouštěcí soubory pro tiskové systémy
+    - Komunikuje s PrintWindow GUI a propojuje tlačítka s odpovídajícím zpracováním
+    """
+
     def __init__(self, window_stack, order_code: str, product_name: str):
         """
         Initializes the print controller and connects signals.
