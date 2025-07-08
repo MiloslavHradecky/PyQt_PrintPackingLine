@@ -94,27 +94,30 @@ class PrintController:
 
         :return: List of lines or empty list if not found / Seznam řádků nebo prázdný list
         """
-        # 🎯 Získání cesty z config.ini
+        # 🎯 Getting path from config.ini / Získání cesty z config.ini
         orders_path = self.config.get_path('orders_path', section='Paths')
 
         if not orders_path:
-            self.messenger.show_error('Error', 'Konfigurační cesta "orders_path" nebyla nalezena.', 'CTRL401')
+            self.normal_logger.log('Error', f'Konfigurační cesta {orders_path} nebyla nalezena!', 'PRICON001')
+            self.messenger.show_error('Error', f'Konfigurační cesta {orders_path} nebyla nalezena!', 'PRICON001')
             self.reset_input_focus()
             return []
 
-        # 🧩 Sestavení cesty k .lbl souboru
+        # 🧩 Build path to .lbl file / Sestavení cesty k .lbl souboru
         lbl_file = orders_path / f'{self.print_window.order_code}.lbl'
 
         if not lbl_file.exists():
-            self.messenger.show_info('Warning', f'Soubor {lbl_file} neexistuje.', 'CTRL402')
+            self.normal_logger.log('Warning', f'Soubor {lbl_file} neexistuje.', 'PRICON002')
+            self.messenger.show_info('Warning', f'Soubor {lbl_file} neexistuje.', 'PRICON002')
             self.reset_input_focus()
             return []
 
         try:
-            # 📄 Načtení obsahu souboru
+            # 📄 Load the contents of a file / Načtení obsahu souboru
             return lbl_file.read_text().splitlines()
         except Exception as e:
-            self.messenger.show_error('Error', str(e), 'CTRL403')
+            self.normal_logger.log('Error', f'Chyba načtení souboru {str(e)}', 'PRICON003')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON003')
             self.reset_input_focus()
             return []
 
