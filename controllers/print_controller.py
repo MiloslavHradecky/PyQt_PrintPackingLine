@@ -157,13 +157,95 @@ class PrintController:
             self.messenger.show_error('Error', f'Chyba zápisu {str(e)}', 'CTRL408')
             self.reset_input_focus()
 
+    def product_save_and_print(self, lbl_lines: list[str]) -> None:
+        """
+        Extracts header and record for the scanned serial number and writes them to product output file.
+        Načte hlavičku a záznam z řádků .lbl pro naskenovaný serial number a zapíše je do výstupního souboru product.
+
+        - Hledá řádky začínající na: SERIAL+B= a SERIAL+D= a SERIAL+E=
+        - Pokud najde hlavičku i záznam, zapíše je do výstupního souboru
+
+        :param lbl_lines: List of lines from .lbl file / Seznam řádků ze souboru
+        """
+        # 🧠 Získání vstupu ze scanu
+        base_input = self.print_window.serial_number_input.text().strip().upper()
+        key_b = f'{base_input}B='
+        key_d = f'{base_input}D='
+        key_e = f'{base_input}E='
+
+        header = None
+        record = None
+
+        for line in lbl_lines:
+            if line.startswith(key_d):
+                header = line.split('D=')[1].strip()
+            elif line.startswith(key_e):
+                record = line.split('E=')[1].strip()
+
+        # 🚦 Kontrola nálezů
+        if not header or not record:
+            self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'CTRL405')
+            self.reset_input_focus()
+            return
+
+        # 📁 Získání cesty z configu
+        config = ConfigLoader()
+        output_path = config.get_path('output_file_path_product', section='ProductPaths')
+
+        if not output_path:
+            self.messenger.show_error('Error', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'CTRL406')
+            self.reset_input_focus()
+            return
+
+        try:
+            # 💾 Zápis hlavičky + záznamu
+            with output_path.open('w') as file:
+                file.write(header + '\n')
+                file.write(record + '\n')
+
+            self.normal_logger.log('Info', f'Product záznam uložen.', 'CTRL407')
+
+            # 🗂️ Získání trigger_path z config.ini
+            trigger_dir = config.get_path('trigger_path', section='Paths')
+
+            if not trigger_dir or not trigger_dir.exists():
+                self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'CTRL409')
+                self.reset_input_focus()
+                return
+
+            # 🔎 Najdeme řádek s I= prefixem
+            trigger_line = next((line for line in lbl_lines if line.startswith(key_b)), None)
+
+            if trigger_line:
+                try:
+                    # ✂️ Rozdělení a vytvoření souborů podle hodnot
+                    trigger_values = trigger_line.split('B=')[1].strip().split(';')
+
+                    for value in trigger_values:
+                        name = value.strip()
+                        if name:
+                            target_file = trigger_dir / name  # ⚠️ Bez přípony!
+                            target_file.touch(exist_ok=True)
+
+                    self.normal_logger.log('Info', f'Vytvořeno {len(trigger_values)} trigger souborů ve složce "{trigger_dir}".', 'CTRL410')
+                    self.reset_input_focus()
+
+                except Exception as e:
+                    self.messenger.show_error('Error', f'Chyba při tvorbě souborů z B= {str(e)}', 'CTRL411')
+                    self.reset_input_focus()
+
+        except Exception as e:
+            self.messenger.show_error('Error', f'Chyba zápisu {str(e)}', 'CTRL408')
+            self.reset_input_focus()
+
     def print_button_click(self):
         if not self.validate_serial_number_input():
             return
 
         lbl_lines = self.load_file_lbl()
         if lbl_lines:
-            self.control4_save_and_print(lbl_lines)
+            # self.control4_save_and_print(lbl_lines)
+            self.product_save_and_print(lbl_lines)
 
     def reset_input_focus(self):
         """
