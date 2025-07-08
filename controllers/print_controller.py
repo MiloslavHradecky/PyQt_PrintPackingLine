@@ -212,7 +212,7 @@ class PrintController:
 
         :param lbl_lines: List of lines from .lbl file / Seznam řádků ze souboru
         """
-        # 🧠 Získání vstupu ze scanu
+        # 🧠 Getting input from a scan / Získání vstupu ze scanu
         base_input = self.serial_input
         key_b = f'{base_input}B='
         key_d = f'{base_input}D='
@@ -227,59 +227,60 @@ class PrintController:
             elif line.startswith(key_e):
                 record = line.split('E=')[1].strip()
 
-        # 🚦 Kontrola nálezů
+        # 🚦 Check of findings / Kontrola nálezů
         if not header or not record:
-            self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'CTRL405')
+            self.normal_logger.log('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON009')
+            self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON009')
             self.reset_input_focus()
             return
 
-        # 📁 Získání cesty z configu
+        # 📁 Getting the path from config / Získání cesty z configu
         output_path = self.config.get_path('output_file_path_product', section='ProductPaths')
 
         if not output_path:
-            self.messenger.show_error('Error', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'CTRL406')
+            self.normal_logger.log('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON010')
+            self.messenger.show_warning('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON010')
             self.reset_input_focus()
             return
 
         try:
-            # 💾 Zápis hlavičky + záznamu
+            # 💾 Writing header + record / Zápis hlavičky + záznamu
             with output_path.open('w') as file:
                 file.write(header + '\n')
                 file.write(record + '\n')
 
-            self.normal_logger.log('Info', f'Product záznam uložen.', 'CTRL407')
-
-            # 🗂️ Získání trigger_path z config.ini
+            # 🗂️ Getting trigger_path from config.ini / Získání trigger_path z config.ini
             trigger_dir = self.get_trigger_dir()
 
             if not trigger_dir or not trigger_dir.exists():
-                self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'CTRL409')
+                self.normal_logger.log('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON011')
+                self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON011')
                 self.reset_input_focus()
                 return
 
-            # 🔎 Najdeme řádek s B= prefixem
+            # 🔎 Find the line with B= prefix / Najdeme řádek s B= prefixem
             trigger_line = next((line for line in lbl_lines if line.startswith(key_b)), None)
 
             if trigger_line:
                 try:
-                    # ✂️ Rozdělení a vytvoření souborů podle hodnot
+                    # ✂️ Splitting and creating files by values / Rozdělení a vytvoření souborů podle hodnot
                     raw_value = trigger_line.split('B=')[1]
                     trigger_values = [val.strip() for val in raw_value.split(';') if val.strip()]
 
                     for value in trigger_values:
                         name = value.strip()
                         if name:
-                            target_file = trigger_dir / name  # ⚠️ Bez přípony!
+                            target_file = trigger_dir / name
                             target_file.touch(exist_ok=True)
 
-                    self.normal_logger.log('Info', f'Vytvořeno {len(trigger_values)} trigger souborů ve složce "{trigger_dir}".', 'CTRL410')
-
                 except Exception as e:
-                    self.messenger.show_error('Error', f'Chyba při tvorbě souborů z B= {str(e)}', 'CTRL411')
+                    self.normal_logger.log('Error', f'Chyba při tvorbě souborů z B= {str(e)}', 'PRICON012')
+                    self.messenger.show_error('Error', f'{str(e)}', 'PRICON012', False)
                     self.reset_input_focus()
 
         except Exception as e:
-            self.messenger.show_error('Error', f'Chyba zápisu {str(e)}', 'CTRL408')
+            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON013')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON013', False)
             self.reset_input_focus()
 
     def my2n_save_and_print(self) -> None:
