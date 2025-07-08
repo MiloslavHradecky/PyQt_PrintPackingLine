@@ -99,7 +99,7 @@ class PrintController:
 
         if not orders_path:
             self.normal_logger.log('Error', f'Konfigurační cesta {orders_path} nebyla nalezena!', 'PRICON001')
-            self.messenger.show_error('Error', f'Konfigurační cesta {orders_path} nebyla nalezena!', 'PRICON001')
+            self.messenger.show_error('Error', f'Konfigurační cesta {orders_path} nebyla nalezena!', 'PRICON001', False)
             self.reset_input_focus()
             return []
 
@@ -117,7 +117,7 @@ class PrintController:
             return lbl_file.read_text().splitlines()
         except Exception as e:
             self.normal_logger.log('Error', f'Chyba načtení souboru {str(e)}', 'PRICON003')
-            self.messenger.show_error('Error', f'{str(e)}', 'PRICON003')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON003', False)
             self.reset_input_focus()
             return []
 
