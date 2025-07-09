@@ -1,6 +1,7 @@
 # 🎛️ LoginController – handles login logic and post-authentication navigation
 # Třída LoginController zajišťuje ověření hesla a přechod do další části aplikace
 
+import subprocess
 import utils.szv_utils
 from core.logger import Logger
 from core.messenger import Messenger
@@ -42,6 +43,16 @@ class LoginController:
         self.login_window.login_button.clicked.connect(self.handle_login)
         self.login_window.exit_button.clicked.connect(self.handle_exit)
 
+    def kill_bartender_processes(self):
+        """ Ukončí všechny běžící instance BarTender (Cmdr.exe a bartend.exe). """
+        try:
+            subprocess.run('taskkill /f /im cmdr.exe 1>nul 2>nul', shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            subprocess.run('taskkill /f /im bartend.exe 1>nul 2>nul', shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
+
+        except subprocess.CalledProcessError as e:
+            self.normal_logger.log('Error', f'Chyba při ukončování BarTender procesů: {str(e)}', 'LOGCON001')
+            self.messenger.show_error('Error', f'{str(e)}', 'LOGCON001', False)
+
     def handle_login(self):
         """
         Handles login validation and user authentication.
@@ -58,17 +69,18 @@ class LoginController:
         try:
             if self.decrypter.check_login(password):
                 self.value_prefix = utils.szv_utils.get_value_prefix()
+                self.kill_bartender_processes()
                 self.open_work_order_window()
             else:
                 # 🟡 Incorrect password entered
-                self.normal_logger.log('Warning', f'Zadané heslo "{password}" není správné!', 'LOGCON001')
-                self.messenger.show_warning('Warning', f'Zadané heslo není správné!', 'LOGCON001')
+                self.normal_logger.log('Warning', f'Zadané heslo "{password}" není správné!', 'LOGCON002')
+                self.messenger.show_warning('Warning', f'Zadané heslo není správné!', 'LOGCON002')
                 self.login_window.password_input.clear()
                 self.login_window.password_input.setFocus()
         except Exception as e:
             # 🔴 Unexpected login failure
-            self.normal_logger.log('Error', f'Neočekávaný problém: {str(e)}', 'LOGCON002')
-            self.messenger.show_error('Error', f'{str(e)}', 'LOGCON002', False)
+            self.normal_logger.log('Error', f'Neočekávaný problém: {str(e)}', 'LOGCON003')
+            self.messenger.show_error('Error', f'{str(e)}', 'LOGCON003', False)
             self.login_window.password_input.clear()
             self.login_window.password_input.setFocus()
 
