@@ -4,6 +4,7 @@
 from pathlib import Path
 from PyQt6.QtWidgets import QMessageBox, QApplication
 from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import QTimer
 
 
 class Messenger:
@@ -86,6 +87,39 @@ class Messenger:
 
         if exit_on_close and result == QMessageBox.StandardButton.Ok:
             QApplication.quit()
+
+    def show_timed_info(self, title: str, message: str, duration_ms: int = 3000):
+        """
+        Shows a transient informational dialog that closes automatically after duration.
+        Zobrazí informační okno, které se automaticky zavře po zadané době.
+
+        :param title: Window title / Název okna
+        :param message: Message to display / Zobrazená zpráva
+        :param duration_ms: How long to show (in milliseconds) / Doba zobrazení v milisekundách
+        """
+        dialog = QMessageBox()
+        dialog.setIcon(QMessageBox.Icon.Information)
+        dialog.setWindowIcon(QIcon(str(self.info_icon_path)))
+        dialog.setWindowTitle(title)
+        dialog.setText(message)
+        dialog.setStandardButtons(QMessageBox.StandardButton.NoButton)  # ⛔ No button / Žádné tlačítko
+
+        dialog.adjustSize()
+
+        # 📍 Placement in the centre / Umístění do středu
+        if self.parent:
+            center = self.parent.geometry().center()
+        else:
+            center = QApplication.primaryScreen().availableGeometry().center()
+
+        dialog_rect = dialog.geometry()
+        dialog.move(center.x() - dialog_rect.width() // 2,
+                    center.y() - dialog_rect.height() // 2)
+
+        dialog.show()
+
+        # ⏲️ Setting the automatic closing / Nastavení automatiky na zavření
+        QTimer.singleShot(duration_ms, dialog.accept)
 
     def _show_dialog(self, title, message, error_code, icon, icon_path):
         """
