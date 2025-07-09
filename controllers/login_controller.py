@@ -44,7 +44,10 @@ class LoginController:
         self.login_window.exit_button.clicked.connect(self.handle_exit)
 
     def kill_bartender_processes(self):
-        """ Ukončí všechny běžící instance BarTender (Cmdr.exe a bartend.exe). """
+        """
+        Terminates all running BarTender instances (Cmdr.exe and bartend.exe).
+        Ukončí všechny běžící instance BarTender (Cmdr.exe a bartend.exe).
+        """
         try:
             subprocess.run('taskkill /f /im cmdr.exe 1>nul 2>nul', shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
             subprocess.run('taskkill /f /im bartend.exe 1>nul 2>nul', shell=True, creationflags=subprocess.CREATE_NO_WINDOW)

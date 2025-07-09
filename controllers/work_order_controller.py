@@ -159,9 +159,23 @@ class WorkOrderController:
         self.work_order_window.work_order_input.clear()
         self.work_order_window.work_order_input.setFocus()
 
+    def kill_bartender_processes(self):
+        """
+        Terminates all running BarTender instances (Cmdr.exe and bartend.exe).
+        Ukončí všechny běžící instance BarTender (Cmdr.exe a bartend.exe).
+        """
+        try:
+            subprocess.run('taskkill /f /im cmdr.exe 1>nul 2>nul', shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            subprocess.run('taskkill /f /im bartend.exe 1>nul 2>nul', shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
+
+        except subprocess.CalledProcessError as e:
+            self.normal_logger.log('Error', f'Chyba při ukončování BarTender procesů: {str(e)}', 'WORDCON010')
+            self.messenger.show_error('Error', f'{str(e)}', 'WORDCON010', False)
+
     def handle_exit(self):
         """
         Closes the current window with fade-out effect.
         Zavře aktuální okno a vrátí se zpět ve stacku.
         """
+        self.kill_bartender_processes()
         self.work_order_window.effects.fade_out(self.work_order_window, duration=2000)
