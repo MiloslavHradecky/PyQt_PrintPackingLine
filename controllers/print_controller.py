@@ -348,7 +348,7 @@ class PrintController:
                 file.write('"L Vyrobni cislo dlouhe","L Bezpecnostni cislo","P Vyrobni cislo","P Bezpecnostni kod"\n')
                 file.write(f'"Serial number:","My2N Security Code:","{serial_number}","{token}"\n')
 
-            self.normal_logger.clear_log('Info', f'My2N token uložen: {token}')
+            self.normal_logger.clear_log('Info', f'{token}')
 
             # 🗂️ Creating trigger file SF_MY2N_A / Vytvoření trigger souboru SF_MY2N_A
             trigger_dir = self.get_trigger_dir()
@@ -407,14 +407,15 @@ class PrintController:
         if 'product' in triggers and lbl_lines:
             self.product_save_and_print(lbl_lines)
             self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etikety...', 3000)
-            self.normal_logger.clear_log('Info', f'{self.product_name}')
-            self.normal_logger.clear_log('Info', f'{self.serial_input}')
+            self.normal_logger.clear_log('Info', f'{self.product_name} {self.serial_input}')
 
         if 'control4' in triggers and lbl_lines:
             self.control4_save_and_print(lbl_lines)
 
         if 'my2n' in triggers:
             self.my2n_save_and_print()
+
+        self.normal_logger.clear_log('Info', f'')
 
         # === 5️⃣ Refresh input field after action / Vyčištění vstupního pole po dokončení
         self.reset_input_focus()
