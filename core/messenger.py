@@ -33,6 +33,8 @@ class Messenger:
 
         self.parent = parent  # ✅ Connecting to the main window / Připojení k hlavnímu oknu
 
+        self._active_dialog = None
+
     def show_info(self, title, message, error_code=None):
         """
         Shows an informational dialog.
@@ -117,6 +119,8 @@ class Messenger:
                     center.y() - dialog_rect.height() // 2)
 
         dialog.show()
+
+        self._active_dialog = dialog
 
         # ⏲️ Setting the automatic closing / Nastavení automatiky na zavření
         QTimer.singleShot(duration_ms, dialog.accept)

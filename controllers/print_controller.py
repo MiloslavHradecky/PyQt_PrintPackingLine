@@ -33,7 +33,7 @@ class PrintController:
         self.window_stack = window_stack
         self.print_window = PrintWindow(order_code, product_name, controller=self)
 
-        self.messenger = Messenger()
+        self.messenger = Messenger(parent=self.print_window)
         self.config = ConfigLoader()
 
         # 📝 Logging setup / Nastavení loggeru
@@ -406,7 +406,7 @@ class PrintController:
         # === 4️⃣ Execute save-and-print functions as needed / Spuštění odpovídajících funkcí
         if 'product' in triggers and lbl_lines:
             self.product_save_and_print(lbl_lines)
-            self.messenger.show_timed_info('Info', f'Tisknu!', 3000)
+            self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etikety...', 3000)
             self.normal_logger.clear_log('Info', f'{self.product_name}')
             self.normal_logger.clear_log('Info', f'{self.serial_input}')
 
