@@ -415,7 +415,7 @@ class PrintController:
         if 'my2n' in triggers:
             self.my2n_save_and_print()
 
-        self.normal_logger.clear_log('Info', f'')
+        self.normal_logger.add_blank_line()
 
         # === 5️⃣ Refresh input field after action / Vyčištění vstupního pole po dokončení
         self.reset_input_focus()

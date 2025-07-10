@@ -80,7 +80,7 @@ class Logger:
         :param error_code: Optional error ID to tag
         """
         if self.spaced:
-            with Path(self.log_file_path).open('a') as f:
+            with Path(self.log_file_path).open('a', encoding='utf-8') as f:
                 f.write('\n')  # ✅ Adding an empty row if 'spaced=True' / Přidání prázdného řádku pokud je 'spaced=True'
 
         log_message = f'{message.ljust(50)} (ID: {error_code})'
@@ -102,7 +102,7 @@ class Logger:
         """
 
         if self.spaced:
-            with Path(self.log_file_path).open('a') as f:
+            with Path(self.log_file_path).open('a', encoding='utf-8') as f:
                 f.write('\n')  # ✅ Adding an empty row if 'spaced=True' / Přidání prázdného řádku pokud je 'spaced=True'
 
         log_message = message.ljust(50)
@@ -113,6 +113,14 @@ class Logger:
             logging.warning(log_message)
         elif level == 'Error':
             logging.error(log_message)
+
+    def add_blank_line(self):
+        """
+        Inserts a single blank line into the log file.
+        Vloží jeden prázdný řádek do logovacího souboru.
+        """
+        with Path(self.log_file_path).open('a', encoding='utf-8') as f:
+            f.write('\n')
 
 # # 📌 Logger Testing - Debug / Testování loggeru - Debug
 # if __name__ == '__main__':
