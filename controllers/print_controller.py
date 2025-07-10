@@ -237,20 +237,24 @@ class PrintController:
 
         # ✨ Inject value_prefix to proper position / Vložení prefixu na správné místo
         try:
-            header_fields = header.split(';')
-            record_fields = record.split(';')
+            header_fields = header.split('","')
+            record_fields = record.split('","')
             znacka_index = header_fields.index('P Znacka balice')
             prefix = get_value_prefix()
 
             if znacka_index < len(record_fields):
                 record_fields[znacka_index] = prefix
-                record = ';'.join(record_fields)
+                record = '","'.join(record_fields)
             else:
                 self.normal_logger.log('Warning', f'Pole "P Znacka balice" má neplatný index v record.', 'PRICON010')
                 self.messenger.show_warning('Warning', f'Pole "P Znacka balice" má neplatný index v record.', 'PRICON010')
+                self.reset_input_focus()
+                return
         except ValueError:
             self.normal_logger.log('Warning', f'Pole "P Znacka balice" nebylo nalezeno v hlavičce.', 'PRICON011')
-            self.messenger.show_warning('Warning', f'Pole "P Znacka balice" má neplatný index v record.', 'PRICON011')
+            self.messenger.show_warning('Warning', f'Pole "P Znacka balice" nebylo nalezeno v hlavičce.', 'PRICON011')
+            self.reset_input_focus()
+            return
 
         # 📁 Getting the path from config / Získání cesty z configu
         output_path = self.config.get_path('output_file_path_product', section='ProductPaths')
@@ -426,7 +430,6 @@ class PrintController:
             self.product_save_and_print(lbl_lines)
             self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etikety...', 3000)
             self.normal_logger.clear_log('Info', f'{self.product_name} {self.serial_input}')
-            self.reset_input_focus()
 
         if 'control4' in triggers and lbl_lines:
             self.control4_save_and_print(lbl_lines)
@@ -435,6 +438,7 @@ class PrintController:
             self.my2n_save_and_print()
 
         self.normal_logger.add_blank_line()
+        self.reset_input_focus()
 
     def reset_input_focus(self):
         """
