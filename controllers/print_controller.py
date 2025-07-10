@@ -7,6 +7,7 @@ from core.logger import Logger
 from core.messenger import Messenger
 from views.print_window import PrintWindow
 from core.config_loader import ConfigLoader
+from utils.szv_utils import get_value_prefix
 
 
 class PrintController:
@@ -234,12 +235,29 @@ class PrintController:
             self.reset_input_focus()
             return
 
+        # ✨ Inject value_prefix to proper position / Vložení prefixu na správné místo
+        try:
+            header_fields = header.split(';')
+            record_fields = record.split(';')
+            znacka_index = header_fields.index('P Znacka balice')
+            prefix = get_value_prefix()
+
+            if znacka_index < len(record_fields):
+                record_fields[znacka_index] = prefix
+                record = ';'.join(record_fields)
+            else:
+                self.normal_logger.log('Warning', f'Pole "P Znacka balice" má neplatný index v record.', 'PRICON010')
+                self.messenger.show_warning('Warning', f'Pole "P Znacka balice" má neplatný index v record.', 'PRICON010')
+        except ValueError:
+            self.normal_logger.log('Warning', f'Pole "P Znacka balice" nebylo nalezeno v hlavičce.', 'PRICON011')
+            self.messenger.show_warning('Warning', f'Pole "P Znacka balice" má neplatný index v record.', 'PRICON011')
+
         # 📁 Getting the path from config / Získání cesty z configu
         output_path = self.config.get_path('output_file_path_product', section='ProductPaths')
 
         if not output_path:
-            self.normal_logger.log('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON010')
-            self.messenger.show_warning('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON010')
+            self.normal_logger.log('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON012')
+            self.messenger.show_warning('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON012')
             self.reset_input_focus()
             return
 
@@ -253,8 +271,8 @@ class PrintController:
             trigger_dir = self.get_trigger_dir()
 
             if not trigger_dir or not trigger_dir.exists():
-                self.normal_logger.log('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON011')
-                self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON011')
+                self.normal_logger.log('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON013')
+                self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON013')
                 self.reset_input_focus()
                 return
 
@@ -274,13 +292,13 @@ class PrintController:
                             target_file.touch(exist_ok=True)
 
                 except Exception as e:
-                    self.normal_logger.log('Error', f'Chyba při tvorbě souborů z B= {str(e)}', 'PRICON012')
-                    self.messenger.show_error('Error', f'{str(e)}', 'PRICON012', False)
+                    self.normal_logger.log('Error', f'Chyba při tvorbě souborů z B= {str(e)}', 'PRICON014')
+                    self.messenger.show_error('Error', f'{str(e)}', 'PRICON014', False)
                     self.reset_input_focus()
 
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON013')
-            self.messenger.show_error('Error', f'{str(e)}', 'PRICON013', False)
+            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON015')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON015', False)
             self.reset_input_focus()
 
     def my2n_save_and_print(self) -> None:
@@ -307,39 +325,39 @@ class PrintController:
         output_path = self.config.get_path('output_file_path_my2n', section='My2nPaths')
 
         if not reports_path or not output_path:
-            self.normal_logger.log('Error', f'Cesty nejsou definovány v config.ini.', 'PRICON014')
-            self.messenger.show_error('Error', f'Cesty nejsou definovány v config.ini.', 'PRICON014', False)
+            self.normal_logger.log('Error', f'Cesty nejsou definovány v config.ini.', 'PRICON016')
+            self.messenger.show_error('Error', f'Cesty nejsou definovány v config.ini.', 'PRICON016', False)
             return
 
         # 🧩 Final path to the input file / Finální cesta ke vstupnímu souboru
         source_file = reports_path / subdir1 / subdir2 / file_name
 
         if not source_file.exists():
-            self.normal_logger.log('Info', f'Report soubor {source_file} neexistuje.', 'PRICON015')
-            self.messenger.show_info('Info', f'Report soubor {source_file} neexistuje.', 'PRICON015')
+            self.normal_logger.log('Info', f'Report soubor {source_file} neexistuje.', 'PRICON017')
+            self.messenger.show_info('Info', f'Report soubor {source_file} neexistuje.', 'PRICON017')
             return
 
         try:
             lines = source_file.read_text().splitlines()
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba čtení {str(e)}', 'PRICON016')
-            self.messenger.show_error('Error', f'{str(e)}', 'PRICON016', False)
+            self.normal_logger.log('Error', f'Chyba čtení {str(e)}', 'PRICON018')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON018', False)
             return
 
         # 🔎 We find the last occurrence of "My2N token:" / Najdeme poslední výskyt "My2N token:"
         token_line = next((line for line in reversed(lines) if 'My2N token:' in line), None)
 
         if not token_line:
-            self.normal_logger.log('Warning', f'V souboru nebyl nalezen žádný My2N token.', 'PRICON017')
-            self.messenger.show_warning('Warning', f'V souboru nebyl nalezen žádný My2N token.', 'PRICON017')
+            self.normal_logger.log('Warning', f'V souboru nebyl nalezen žádný My2N token.', 'PRICON019')
+            self.messenger.show_warning('Warning', f'V souboru nebyl nalezen žádný My2N token.', 'PRICON019')
             return
 
         # ✂️ Token extraction / Extrakce tokenu
         try:
             token = token_line.split('My2N token:')[1].strip()
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba extrakce {str(e)}', 'PRICON018')
-            self.messenger.show_error('Error', f'Chyba extrakce {str(e)}', 'PRICON018', False)
+            self.normal_logger.log('Error', f'Chyba extrakce {str(e)}', 'PRICON020')
+            self.messenger.show_error('Error', f'Chyba extrakce {str(e)}', 'PRICON020', False)
             return
 
         # 📄 Write to output file / Zápis do výstupního souboru
@@ -359,15 +377,15 @@ class PrintController:
                     trigger_file.touch(exist_ok=True)
 
                 except Exception as e:
-                    self.normal_logger.log('Error', f'Chyba trigger souboru {str(e)}', 'PRICON019')
-                    self.messenger.show_error('Error', f'Chyba trigger souboru {str(e)}', 'PRICON019', False)
+                    self.normal_logger.log('Error', f'Chyba trigger souboru {str(e)}', 'PRICON021')
+                    self.messenger.show_error('Error', f'Chyba trigger souboru {str(e)}', 'PRICON021', False)
             else:
-                self.normal_logger.log('Warning', f'Složka "trigger_path" není definována nebo neexistuje.', 'PRICON020')
-                self.messenger.show_warning('Warning', f'Složka "trigger_path" není definována nebo neexistuje.', 'PRICON020')
+                self.normal_logger.log('Warning', f'Složka "trigger_path" není definována nebo neexistuje.', 'PRICON022')
+                self.messenger.show_warning('Warning', f'Složka "trigger_path" není definována nebo neexistuje.', 'PRICON022')
 
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON021')
-            self.messenger.show_error('Error', f'{str(e)}', 'PRICON021', False)
+            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON023')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON023', False)
 
     def get_trigger_groups_for_product(self) -> list[str]:
         """
@@ -408,6 +426,7 @@ class PrintController:
             self.product_save_and_print(lbl_lines)
             self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etikety...', 3000)
             self.normal_logger.clear_log('Info', f'{self.product_name} {self.serial_input}')
+            self.reset_input_focus()
 
         if 'control4' in triggers and lbl_lines:
             self.control4_save_and_print(lbl_lines)
@@ -416,9 +435,6 @@ class PrintController:
             self.my2n_save_and_print()
 
         self.normal_logger.add_blank_line()
-
-        # === 5️⃣ Refresh input field after action / Vyčištění vstupního pole po dokončení
-        self.reset_input_focus()
 
     def reset_input_focus(self):
         """
