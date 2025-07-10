@@ -119,4 +119,4 @@ class WorkOrderWindow(QWidget):
         self.activateWindow()
         self.raise_()
         self.work_order_input.setFocus()
-        self.effects.fade_in(self, duration=3000)  # 🌟 Visual animation / Vizuální animace
+        self.effects.fade_in(self, duration=1000)  # 🌟 Visual animation / Vizuální animace

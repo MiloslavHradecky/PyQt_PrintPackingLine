@@ -133,4 +133,4 @@ class PrintWindow(QWidget):
         self.serial_number_input.setFocus()
 
         # ✨ Launch animation / Vizuální animace
-        self.effects.fade_in(self, duration=2000)
+        self.effects.fade_in(self, duration=1000)

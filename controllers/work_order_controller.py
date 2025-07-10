@@ -178,4 +178,4 @@ class WorkOrderController:
         Zavře aktuální okno a vrátí se zpět ve stacku.
         """
         self.kill_bartender_processes()
-        self.work_order_window.effects.fade_out(self.work_order_window, duration=2000)
+        self.work_order_window.effects.fade_out(self.work_order_window, duration=1000)

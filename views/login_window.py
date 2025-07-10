@@ -129,4 +129,4 @@ class LoginWindow(QWidget):
         self.raise_()  # 💡 Bring the window to the foreground / Přivedeme okno do popředí
 
         self.password_input.setFocus()
-        self.effects.fade_in(self, duration=3000)  # 🌟 Visual animation / Vizuální animace
+        self.effects.fade_in(self, duration=1000)  # 🌟 Visual animation / Vizuální animace

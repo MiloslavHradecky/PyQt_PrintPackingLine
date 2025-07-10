@@ -433,4 +433,4 @@ class PrintController:
         Closes PrintWindow and returns to the previous window.
         Zavře PrintWindow a vrátí se na předchozí okno ve stacku.
         """
-        self.print_window.effects.fade_out(self.print_window, duration=2000)
+        self.print_window.effects.fade_out(self.print_window, duration=1000)

@@ -105,4 +105,4 @@ class LoginController:
         Zpracuje ukončení aplikace z přihlašovacího okna.
         """
         # 💡 This triggers signal destroyed → stack manager does its thing / To spustí signal destroyed → stack manager udělá své
-        self.login_window.effects.fade_out(self.login_window, duration=2000)
+        self.login_window.effects.fade_out(self.login_window, duration=1000)

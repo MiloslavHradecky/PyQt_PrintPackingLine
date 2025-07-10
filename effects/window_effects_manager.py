@@ -12,7 +12,7 @@ class WindowEffectsManager:
         """
         self._animations = {}
 
-    def fade_in(self, widget, duration=3000):
+    def fade_in(self, widget, duration=1000):
         """
         Applies a fade-in effect to the window.
         Aplikuje efekt „zobrazení“ – plynulé zobrazení okna.
@@ -32,7 +32,7 @@ class WindowEffectsManager:
         animation.start()
         self._animations[widget] = animation  # ochrání před GC
 
-    def fade_out(self, widget, duration=2000):
+    def fade_out(self, widget, duration=1000):
         """
         Applies a fade-out effect and closes the window when complete.
         Aplikuje efekt „zmizení“ a poté zavře okno.
