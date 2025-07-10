@@ -21,10 +21,10 @@ cd "C:\Users\Home\Documents\Coding\Python\PyQt\PyQt_LineB\"
 
 
 a = Analysis(
-    ['main.py', 'login_window.py', 'szv_utils.py', 'intermediate.py', 'app_window.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('controllers/', 'controllers/'), ('core/', 'core/'), ('effects/', 'effects/'), ('log/', 'log/'), ('resources/ico/', 'resources/ico/'), ('setup/', 'setup/'), ('utils/', 'utils/'), ('views/', 'views/')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -55,7 +55,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     version='version.txt',
-    icon=['img/b_line.ico'],
+    icon=['resources/ico/b_line.ico'],
 )
 ```
 
@@ -89,7 +89,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('controllers/', 'controllers/'), ('core/', 'core/'), ('effects/', 'effects/'), ('resources/ico/', 'resources/ico/'), ('utils/', 'utils/'), ('views/', 'views/')],
+    datas=[('controllers/', 'controllers/'), ('core/', 'core/'), ('effects/', 'effects/'), ('log/', 'log/'), ('resources/ico/', 'resources/ico/'), ('setup/', 'setup/'), ('utils/', 'utils/'), ('views/', 'views/')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

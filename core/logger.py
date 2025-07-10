@@ -49,7 +49,6 @@ class Logger:
         # 📁 Resolve log file path from config / Získání logovací cesty z configu
         relative_log_path = config.get('Paths', 'log_file_path')
         self.log_file_path = Path(relative_log_path)
-        # self.log_file_path = Path(__file__).parent.parent / relative_log_path
         self.log_file_path = self.log_file_path.resolve()
         self.log_file_path.parent.mkdir(parents=True, exist_ok=True)
 
