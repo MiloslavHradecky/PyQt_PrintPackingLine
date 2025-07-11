@@ -51,17 +51,26 @@ Podporuje strukturované formáty souborů (`.lbl`, `.nor`), konfiguraci přes `
 ## 📂 Structure
 
 ```
-PrintPackingLine/
-├── img/ # Icons
-├── etikety/ # Output files (.txt)
-├── prikazy/ # Input files (.lbl / .nor)
-├── config.ini # Configuration mapping
-├── main.py # Application launcher
-├── app_window.py # Main app class
-├── controller.py # Event handling
-├── model.py # Business logic
-├── view.py # UI and styles
-├── szv_utils.py # Shared utilities
+📦 PrintPackingLine/
+├── .idea/
+├── build/
+├── controllers/
+├── core/
+├── dist/
+├── effects/
+├── info/
+├── log/
+├── resources/
+│   └── ico/
+├── setup/
+├── utils/
+├── views/
+├── .gitignore
+├── LICENSE
+├── LineB
+├── main
+├── README
+└── version
 ```
 
 ---
