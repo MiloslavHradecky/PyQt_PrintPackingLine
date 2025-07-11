@@ -51,18 +51,18 @@ class WorkOrderController:
         tl_file_path = config.get_path('tl_file_path', section='Paths')
 
         if not commander_path or not tl_file_path:
-            self.normal_logger.log('Warning', 'Cesty k BarTender Commanderu nejsou dostupné v config.ini', 'WORDCON001')
-            self.messenger.show_warning('Warning', 'Cesty k BarTender Commanderu nejsou dostupné v config.ini', 'WORDCON001')
+            self.normal_logger.log('Warning', 'Cesty k BarTender Commanderu nejsou dostupné v config.ini', 'WORORCON001')
+            self.messenger.show_warning('Warning', 'Cesty k BarTender Commanderu nejsou dostupné v config.ini', 'WORORCON001')
             return
 
         try:
             process = subprocess.Popen([str(commander_path), "/START", "/MIN=SystemTray", "/NOSPLASH", str(tl_file_path)], shell=True)
 
-            self.normal_logger.log('Info', f'BarTender Commander spuštěn: {process.pid}', 'WORDCON002')
+            self.normal_logger.log('Info', f'BarTender Commander spuštěn: {process.pid}', 'WORORCON002')
 
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba při spuštění BarTender Commanderu: {str(e)}', 'WORDCON003')
-            self.messenger.show_error('Error', f'Chyba při spuštění BarTender Commanderu: {str(e)}', 'WORDCON003', False)
+            self.normal_logger.log('Error', f'Chyba při spuštění BarTender Commanderu: {str(e)}', 'WORORCON003')
+            self.messenger.show_error('Error', f'Chyba při spuštění BarTender Commanderu: {str(e)}', 'WORORCON003', False)
 
     def work_order_button_click(self):
         """
@@ -78,7 +78,7 @@ class WorkOrderController:
         # 📌 Processing of input / Zpracování vstupu
         value_input = self.work_order_window.work_order_input.text().strip().upper()
         if not value_input:
-            self.messenger.show_warning('Warning', f'Zadejte prosím výrobní příkaz!', 'WORDCON004')
+            self.messenger.show_warning('Warning', f'Zadejte prosím výrobní příkaz!', 'WORORCON004')
             self.reset_input_focus()
             return
 
@@ -91,8 +91,8 @@ class WorkOrderController:
         if not self.lbl_file.exists() or not self.nor_file.exists():
             self.lines = []
             self.found_product_name = None
-            self.normal_logger.log('Warning', f'Soubor {self.lbl_file} nebo {self.nor_file} nebyl nalezen!', 'WORDCON005')
-            self.messenger.show_warning('Warning', f'Soubor {self.lbl_file} nebo {self.nor_file} nebyl nalezen!', 'WORDCON005')
+            self.normal_logger.log('Warning', f'Soubor {self.lbl_file} nebo {self.nor_file} nebyl nalezen!', 'WORORCON005')
+            self.messenger.show_warning('Warning', f'Soubor {self.lbl_file} nebo {self.nor_file} nebyl nalezen!', 'WORORCON005')
             self.reset_input_focus()
             return
 
@@ -106,8 +106,8 @@ class WorkOrderController:
                     product_name = parts[1].strip()
 
                     if nor_order_code != value_input:
-                        self.normal_logger.log('Warning', f'Výrobní příkaz v souboru .NOR ({nor_order_code}) neodpovídá zadanému vstupu ({value_input})!', 'WORDCON006')
-                        self.messenger.show_warning('Warning', f'Výrobní příkaz v souboru .NOR ({nor_order_code}) neodpovídá zadanému vstupu ({value_input})!', 'WORDCON006')
+                        self.normal_logger.log('Warning', f'Výrobní příkaz v souboru .NOR ({nor_order_code}) neodpovídá zadanému vstupu ({value_input})!', 'WORORCON006')
+                        self.messenger.show_warning('Warning', f'Výrobní příkaz v souboru .NOR ({nor_order_code}) neodpovídá zadanému vstupu ({value_input})!', 'WORORCON006')
                         self.reset_input_focus()
                         return
 
@@ -120,13 +120,13 @@ class WorkOrderController:
                     self.reset_input_focus()
 
                 else:
-                    self.normal_logger.log('Warning', f'Řádek v souboru {self.nor_file} nemá očekávaný formát.', 'WORDCON007')
-                    self.messenger.show_warning('Warning', f'Řádek v souboru {self.nor_file} nemá očekávaný formát.', 'WORDCON007')
+                    self.normal_logger.log('Warning', f'Řádek v souboru {self.nor_file} nemá očekávaný formát.', 'WORORCON007')
+                    self.messenger.show_warning('Warning', f'Řádek v souboru {self.nor_file} nemá očekávaný formát.', 'WORORCON007')
                     self.reset_input_focus()
                     return
         except Exception as e:
-            self.normal_logger.log('Error', f'Neočekávaná chyba při zpracování .NOR souboru: {e}', 'WORDCON008')
-            self.messenger.show_error('Error', f'{e}', 'WORDCON008', exit_on_close=False)
+            self.normal_logger.log('Error', f'Neočekávaná chyba při zpracování .NOR souboru: {e}', 'WORORCON008')
+            self.messenger.show_error('Error', f'{e}', 'WORORCON008', exit_on_close=False)
             self.reset_input_focus()
             return
 
@@ -138,8 +138,8 @@ class WorkOrderController:
         try:
             return file_path.read_text().splitlines()
         except Exception as e:
-            self.normal_logger.log('Error', f'Soubor {file_path} se nepodařilo načíst: {e}', 'WORDCON009')
-            self.messenger.show_error('Error', f'{e}', 'WORDCON009', False)
+            self.normal_logger.log('Error', f'Soubor {file_path} se nepodařilo načíst: {e}', 'WORORCON009')
+            self.messenger.show_error('Error', f'{e}', 'WORORCON009', False)
             return []
 
     def open_app_window(self, order_code, product_name):
@@ -169,8 +169,8 @@ class WorkOrderController:
             subprocess.run('taskkill /f /im bartend.exe 1>nul 2>nul', shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
         except subprocess.CalledProcessError as e:
-            self.normal_logger.log('Error', f'Chyba při ukončování BarTender procesů: {str(e)}', 'WORDCON010')
-            self.messenger.show_error('Error', f'{str(e)}', 'WORDCON010', False)
+            self.normal_logger.log('Error', f'Chyba při ukončování BarTender procesů: {str(e)}', 'WORORCON010')
+            self.messenger.show_error('Error', f'{str(e)}', 'WORORCON010', False)
 
     def handle_exit(self):
         """
