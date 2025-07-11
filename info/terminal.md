@@ -1,20 +1,20 @@
-# Commands to create an exe file / Příkazy pro vytvoření souboru exe
+# Commands to create an exe file
 
 ## Home
 
-### Open a session in a given folder / Otevřít session v danné složce
+### 1. Open a session in a given folder
 
 ```Powershell
 cd "C:\Users\Home\Documents\Coding\Python\PyQt\PyQt_LineB\"
 ```
 
-### Create a .spec file / Vytvoříme soubor .spec
+### 2. Create a .spec file
 
 ```Powershell
 & "C:\Users\Home\AppData\Local\Programs\Python\Python313\python.exe" "C:\Users\Home\AppData\Local\Programs\Python\Python313\Scripts\pyinstaller.exe" --name=LineB --version-file=version.txt --noconfirm --onefile --noconsole --windowed --icon=resources\ico\b_line.ico main.py
 ```
 
-### Edit the created .spec file / Upravíme vytvořený soubor .spec
+### 3. Edit the created .spec file
 
 ```Text
 # -*- mode: python ; coding: utf-8 -*-
@@ -59,7 +59,7 @@ exe = EXE(
 )
 ```
 
-### Create an .exe / Vytvoříme .exe
+### 4. Create an .exe
 
 ```Powershell
 & "C:\Users\Home\AppData\Local\Programs\Python\Python313\python.exe" "C:\Users\Home\AppData\Local\Programs\Python\Python313\Scripts\pyinstaller.exe" LineB.spec
@@ -67,19 +67,19 @@ exe = EXE(
 
 ## Work
 
-### Open a session in a given folder / Otevřít session v danné složce
+### 1. Open a session in a given folder
 
 ```Powershell
 cd "C:\GitWork\Python\PyQt\PyQt_PrintPackingLine\"
 ```
 
-### Vytvoříme soubor .spec
+### 2. Create a .spec file
 
 ```Powershell
 & "C:\Users\hradecky\AppData\Local\Programs\Python\Python313\python.exe" "C:\Users\hradecky\AppData\Local\Programs\Python\Python313\Scripts\pyinstaller.exe" --name=LineB --version-file=version.txt --noconfirm --onefile --noconsole --windowed --icon=resources\ico\b_line.ico main.py
 ```
 
-### Upravíme vytvořený soubor .spec
+### 3. Edit the created .spec file
 
 ```Text
 # -*- mode: python ; coding: utf-8 -*-
@@ -124,7 +124,7 @@ exe = EXE(
 )
 ```
 
-### Vytvoříme exe
+### 4. Create an .exe
 
 ```Powershell
 & "C:\Users\hradecky\AppData\Local\Programs\Python\Python313\python.exe" "C:\Users\hradecky\AppData\Local\Programs\Python\Python313\Scripts\pyinstaller.exe" LineB.spec
