@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 class ConfigLoader:
-    def __init__(self, config_path: Path = Path(__file__).parent.parent / 'setup' / 'config.ini'):
+    def __init__(self, config_path: Path = Path('setup') / 'config.ini'):
         """
         Initializes and loads the config file.
         Inicializuje a načte konfigurační soubor .ini pomocí Pathlib.

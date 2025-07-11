@@ -31,7 +31,7 @@ class Logger:
             record.levelname = self.ICONS.get(record.levelname, record.levelname)
             return super().format(record)
 
-    def __init__(self, config_file: Path = Path(__file__).parent.parent / 'setup' / 'config.ini', spaced=False):
+    def __init__(self, config_file: Path = Path('setup') / 'config.ini', spaced=False):
         """
         Initializes logging to a file, optionally with spacing.
         Inicializuje logování do souboru, případně s volitelným prázdným řádkem.

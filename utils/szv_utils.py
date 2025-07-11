@@ -29,7 +29,7 @@ class SzvDecrypt:
     - Verifies hashed credentials
     """
 
-    def __init__(self, config_file: Path = Path(__file__).parent.parent / 'setup' / 'config.ini'):
+    def __init__(self, config_file: Path = Path('setup') / 'config.ini'):
         """
         Initializes decryption class and loads configuration.
         Inicializuje dekodér a načte cestu k šifrovanému souboru.
