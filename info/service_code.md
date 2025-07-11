@@ -1,4 +1,4 @@
-# 💻 List of service codes for the application LineB
+# ⚙️ List of service codes for the application LineB
 
 <table>
   <thead>
