@@ -1,12 +1,16 @@
-# List of service codes for the application LineB / Výpis servisních kódů pro aplikaci LineB
+# 💻 List of service codes for the application LineB
 
-| Label / Označení | File / Soubor               |
-|:-----------------|:----------------------------|
-| SZVUTxxx         | szv_utils.py                |
-| CSNCONxxx        | check\_snc_controller.py    |
-| MANCONxxx        | manual_controller.py        |
-| PROCONxxx        | product_controller.py       |
-| SERCONxxx        | serialization_controller.py |
-| MAPCSCONxxx      | manual\_pcs_controller.py   |
-| LOGCONxxx        | login_controller.py         |
-| MODxxx           | model.py                    |
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left;">Label</th>
+      <th style="text-align: left;">File</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>SZVUTxxx</td><td>szv_utils.py</td></tr>
+    <tr><td>LOGCONxxx</td><td>login_controller.py</td></tr>
+    <tr><td>WORDCONxxx</td><td>work_order_controller.py</td></tr>
+    <tr><td>PRICONxxx</td><td>print_controller.py</td></tr>
+  </tbody>
+</table>
