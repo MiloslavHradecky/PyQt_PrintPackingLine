@@ -46,8 +46,8 @@ class SzvDecrypt:
         config.read(config_file)
 
         if not config.sections():
-            self.spaced_logger.log('Error', f'Config file nebyl nalezen: {config_file}', 'MOD001')
-            self.messenger.show_error('Error', f'Config file nebyl nalezen: {config_file}', 'MOD001', True)
+            self.spaced_logger.log('Error', f'Config file nebyl nalezen: {config_file}', 'SZVUT001')
+            self.messenger.show_error('Error', f'Config file nebyl nalezen: {config_file}', 'SZVUT001', True)
 
         self.szv_input_file = config.get('Paths', 'szv_input_file', fallback='T:/Prikazy/DataTPV/SZV.dat')
 
@@ -68,7 +68,7 @@ class SzvDecrypt:
                     decoded_line = self.decoding_line(byte_array)
                     self.normal_logger.clear_log('Info', f'Dekódovaný řádek: {decoded_line}')
         except Exception as e:
-            self.normal_logger.log('Error', f'Při čtení souboru došlo k chybě: {str(e)}', 'MOD002')
+            self.normal_logger.log('Error', f'Při čtení souboru došlo k chybě: {str(e)}', 'SZVUT002')
 
     def decoding_line(self, encoded_data):
         """
@@ -88,8 +88,8 @@ class SzvDecrypt:
 
             return decoded_data.decode('windows-1250').split('\x15')
         except Exception as e:
-            self.normal_logger.log('Error', f'Dekódování selhalo: {e}', 'MOD003')
-            self.messenger.show_error('Error', f'{e}', 'MOD003', True)
+            self.normal_logger.log('Error', f'Dekódování selhalo: {e}', 'SZVUT003')
+            self.messenger.show_error('Error', f'{e}', 'SZVUT003', True)
             return []
 
     def check_login(self, password):
@@ -117,19 +117,19 @@ class SzvDecrypt:
                             self.spaced_logger.clear_log('Info', f'Logged: {self.value_surname} {self.value_name} {self.value_prefix}')
                             return True
                         else:
-                            self.normal_logger.log('Warning', f'Řádek neobsahuje dostatek částí: {decoded_line[1]}', 'MOD004')
+                            self.normal_logger.log('Warning', f'Řádek neobsahuje dostatek částí: {decoded_line[1]}', 'SZVUT004')
                             return False
                     else:
-                        self.normal_logger.log('Warning', f'Řádek neobsahuje další části: {decoded_line}', 'MOD005')
+                        self.normal_logger.log('Warning', f'Řádek neobsahuje další části: {decoded_line}', 'SZVUT005')
                         return False
 
-            self.spaced_logger.log('Warning', f'Zadané heslo ({password}) nebylo nalezeno v souboru ({self.szv_input_file}).', 'MOD006')
+            self.spaced_logger.log('Warning', f'Zadané heslo ({password}) nebylo nalezeno v souboru ({self.szv_input_file}).', 'SZVUT006')
 
             return False
 
         except Exception as e:
-            self.normal_logger.log('Error', f'Neočekávaná chyba při ověřování hesla: {str(e)}', 'MOD007')
-            self.messenger.show_error('Error', f'{str(e)}', 'MOD007', True)
+            self.normal_logger.log('Error', f'Neočekávaná chyba při ověřování hesla: {str(e)}', 'SZVUT007')
+            self.messenger.show_error('Error', f'{str(e)}', 'SZVUT007', True)
             return False
 
     def decoding_file(self):
@@ -148,11 +148,11 @@ class SzvDecrypt:
                     if decoded_line and len(decoded_line) >= 1:
                         decoded_lines.append([hashlib.sha256(decoded_line[0].encode()).hexdigest(), ','.join(decoded_line)])
                     else:
-                        self.normal_logger.log('Error', f'Přeskočen chybný dekódovaný řádek.', 'MOD008')
-                        self.messenger.show_error('Error', f'Přeskočen chybný dekódovaný řádek.', 'MOD008', False)
+                        self.normal_logger.log('Error', f'Přeskočen chybný dekódovaný řádek.', 'SZVUT008')
+                        self.messenger.show_error('Error', f'Přeskočen chybný dekódovaný řádek.', 'SZVUT008', False)
         except Exception as e:
-            self.normal_logger.log('Error', f'Při čtení souboru došlo k chybě: {str(e)}', 'MOD009')
-            self.messenger.show_error('Error', f'{str(e)}', 'MOD009', True)
+            self.normal_logger.log('Error', f'Při čtení souboru došlo k chybě: {str(e)}', 'SZVUT009')
+            self.messenger.show_error('Error', f'{str(e)}', 'SZVUT009', True)
             return []
 
         return decoded_lines
