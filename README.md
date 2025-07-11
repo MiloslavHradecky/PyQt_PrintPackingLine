@@ -12,7 +12,7 @@ Supports structured file formats (`.lbl`, `.nor`), dynamic config mapping (`.ini
 ### ✨ Features
 
 - Serial number input and format validation
-- Label extraction (D/E rows) and extended trigger logic (J/K rows for C4-SMART products)
+- Label extraction (B/D/E rows) and extended trigger logic (I/J/K rows for C4-SMART products)
 - Config-driven mapping of product triggers
 - Automatic file generation for BarTender integration
 - Separate file outputs for main product and C4 product variants
@@ -29,7 +29,7 @@ Podporuje strukturované formáty souborů (`.lbl`, `.nor`), konfiguraci přes `
 ### ✨ Funkce
 
 - Zadání a validace sériového čísla (formát `00-0000-0000`)
-- Načítání etiket z řádků D/E, rozšířená logika pro J/K řádky (produkty C4-SMART)
+- Načítání etiket z řádků B/D/E, rozšířená logika pro I/J/K řádky (produkty C4-SMART)
 - Mapování produktových spouštěčů pomocí konfigurace
 - Automatické generování souborů pro BarTender Commander
 - Oddělený výstup souborů pro hlavní produkt i variantu C4
