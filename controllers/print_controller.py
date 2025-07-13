@@ -229,11 +229,14 @@ class PrintController:
                 record = line.split('E=')[1].strip()
 
         # 🚦 Check of findings / Kontrola nálezů
-        if not header or not record:
-            self.normal_logger.log('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON009')
-            self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON009')
-            self.reset_input_focus()
-            return
+        try:
+            if not header or not record:
+                self.normal_logger.log('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON009')
+                self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON009')
+                self.reset_input_focus()
+                return
+        except (AttributeError, TypeError) as e:
+            self.normal_logger.log('Warning', f'{e}.', 'PRICON009')
 
         # ✨ Inject value_prefix to proper position / Vložení prefixu na správné místo
         try:
@@ -294,7 +297,7 @@ class PrintController:
                         if name:
                             target_file = trigger_dir / name
                             target_file.touch(exist_ok=True)
-                            self.messenger.show_while_printing(timeout_seconds=20)
+                            self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etikety...', 3000)
 
                 except Exception as e:
                     self.normal_logger.log('Error', f'Chyba při tvorbě souborů z B= {str(e)}', 'PRICON014')

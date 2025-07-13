@@ -1,8 +1,6 @@
 # 📬 Messenger – user-facing message dialogs with icons and optional app exit
 # Správce zpráv aplikace (info, warning, error) s podporou zarovnání a ikon
 
-import time
-import win32print
 from pathlib import Path
 from PyQt6.QtWidgets import QMessageBox, QApplication
 from PyQt6.QtGui import QIcon
@@ -156,60 +154,3 @@ class Messenger:
                         screen_center.y() - dialog_rect.height() // 2)
 
         return dialog.exec()
-
-    def hide_info(self):
-        """
-        Hides the currently active info dialog, if present.
-        Zavře aktivní informační okno, pokud existuje.
-        """
-        if self._active_dialog:
-            self._active_dialog.close()
-            self._active_dialog = None
-
-    @staticmethod
-    def printer_is_active() -> bool:
-        printers = win32print.EnumPrinters(2)  # 2 = lokalní tiskárny
-        for _, _, name, _ in printers:
-            handle = win32print.OpenPrinter(name)
-            try:
-                jobs = win32print.EnumJobs(handle, 0, 99, 1)
-                if jobs:
-                    return True  # ✅ Tisková fronta není prázdná
-            finally:
-                win32print.ClosePrinter(handle)
-        return False
-
-    def show_while_printing(self, timeout_seconds=5):
-        dialog = QMessageBox()
-        dialog.setIcon(QMessageBox.Icon.Information)
-        dialog.setWindowIcon(QIcon(str(self.info_icon_path)))
-        dialog.setWindowTitle('Info')
-        dialog.setText('Prosím čekejte, tisknu etikety...')
-        dialog.setStandardButtons(QMessageBox.StandardButton.NoButton)
-
-        dialog.adjustSize()
-
-        # 📍 Placement in the centre / Umístění do středu
-        if self.parent:
-            center = self.parent.geometry().center()
-        else:
-            center = QApplication.primaryScreen().availableGeometry().center()
-
-        dialog_rect = dialog.geometry()
-        dialog.move(center.x() - dialog_rect.width() // 2,
-                    center.y() - dialog_rect.height() // 2)
-
-        dialog.show()
-        self._active_dialog = dialog
-
-        # ⏳ Smyčka kontroly tisku
-        start_time = time.time()
-
-        while self.printer_is_active():
-            if time.time() - start_time > timeout_seconds:
-                print('⏱️ Timeout! Tisk se pravděpodobně zasekl.')
-                break
-            time.sleep(0.5)
-
-        dialog.accept()  # ✅ Zavře okno po dokončení tisku
-        self._active_dialog = None
