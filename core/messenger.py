@@ -179,9 +179,30 @@ class Messenger:
                 win32print.ClosePrinter(handle)
         return False
 
-    def show_while_printing(self, timeout_seconds=15):
-        self.show_info('Info', 'Prosím čekejte, tisknu etikety...')
+    def show_while_printing(self, timeout_seconds=5):
+        dialog = QMessageBox()
+        dialog.setIcon(QMessageBox.Icon.Information)
+        dialog.setWindowIcon(QIcon(str(self.info_icon_path)))
+        dialog.setWindowTitle('Info')
+        dialog.setText('Prosím čekejte, tisknu etikety...')
+        dialog.setStandardButtons(QMessageBox.StandardButton.NoButton)
 
+        dialog.adjustSize()
+
+        # 📍 Placement in the centre / Umístění do středu
+        if self.parent:
+            center = self.parent.geometry().center()
+        else:
+            center = QApplication.primaryScreen().availableGeometry().center()
+
+        dialog_rect = dialog.geometry()
+        dialog.move(center.x() - dialog_rect.width() // 2,
+                    center.y() - dialog_rect.height() // 2)
+
+        dialog.show()
+        self._active_dialog = dialog
+
+        # ⏳ Smyčka kontroly tisku
         start_time = time.time()
 
         while self.printer_is_active():
@@ -190,4 +211,5 @@ class Messenger:
                 break
             time.sleep(0.5)
 
-        self.hide_info()
+        dialog.accept()  # ✅ Zavře okno po dokončení tisku
+        self._active_dialog = None

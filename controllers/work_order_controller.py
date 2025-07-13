@@ -51,8 +51,8 @@ class WorkOrderController:
         tl_file_path = config.get_path('tl_file_path', section='Paths')
 
         if not commander_path or not tl_file_path:
-            self.normal_logger.log('Warning', 'Cesty k BarTender Commanderu nejsou dostupné v config.ini', 'WORORCON001')
-            self.messenger.show_warning('Warning', 'Cesty k BarTender Commanderu nejsou dostupné v config.ini', 'WORORCON001')
+            self.normal_logger.log('Error', 'Cesty k BarTender Commanderu nejsou dostupné v config.ini', 'WORORCON001')
+            self.messenger.show_error('Error', 'Cesty k BarTender Commanderu nejsou dostupné v config.ini', 'WORORCON001', True)
             return
 
         try:
@@ -62,7 +62,7 @@ class WorkOrderController:
 
         except Exception as e:
             self.normal_logger.log('Error', f'Chyba při spuštění BarTender Commanderu: {str(e)}', 'WORORCON003')
-            self.messenger.show_error('Error', f'Chyba při spuštění BarTender Commanderu: {str(e)}', 'WORORCON003', False)
+            self.messenger.show_error('Error', f'Chyba při spuštění BarTender Commanderu: {str(e)}', 'WORORCON003', True)
 
     def work_order_button_click(self):
         """
