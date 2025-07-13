@@ -294,6 +294,7 @@ class PrintController:
                         if name:
                             target_file = trigger_dir / name
                             target_file.touch(exist_ok=True)
+                            self.messenger.show_while_printing(timeout_seconds=20)
 
                 except Exception as e:
                     self.normal_logger.log('Error', f'Chyba při tvorbě souborů z B= {str(e)}', 'PRICON014')
@@ -428,7 +429,6 @@ class PrintController:
         # === 4️⃣ Execute save-and-print functions as needed / Spuštění odpovídajících funkcí
         if 'product' in triggers and lbl_lines:
             self.product_save_and_print(lbl_lines)
-            self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etikety...', 3000)
             self.normal_logger.clear_log('Info', f'{self.product_name} {self.serial_input}')
 
         if 'control4' in triggers and lbl_lines:
