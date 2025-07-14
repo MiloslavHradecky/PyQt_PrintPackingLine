@@ -123,7 +123,7 @@ class PrintController:
             self.print_window.reset_input_focus()
             return []
 
-    def control4_save_and_print(self, lbl_lines: list[str]) -> None:
+    def control4_save_and_print(self, header: str, record: str, trigger_values: list[str]) -> None:
         """
         Extracts header and record for the scanned serial number and writes them to Control4 output file.
         Načte hlavičku a záznam z řádků .lbl pro naskenovaný serial number a zapíše je do výstupního souboru Control4.
@@ -131,77 +131,43 @@ class PrintController:
         - Hledá řádky začínající na: SERIAL+I= a SERIAL+J= a SERIAL+K=
         - Pokud najde hlavičku i záznam, zapíše je do výstupního souboru
 
-        :param lbl_lines: List of lines from .lbl file / Seznam řádků ze souboru
+        :param header: extracted header line / extrahovaná hlavička z .lbl
+        :param record: extracted record line / extrahovaný záznam z .lbl
+        :param trigger_values: list of trigger filenames / seznam názvů souborů spouštěče
         """
-        # 🧠 Getting input from a scan / Získání vstupu ze scanu
-        base_input = self.serial_input
-        key_i = f'{base_input}I='
-        key_j = f'{base_input}J='
-        key_k = f'{base_input}K='
-
-        header = None
-        record = None
-
-        for line in lbl_lines:
-            if line.startswith(key_j):
-                header = line.split('J=')[1].strip()
-            elif line.startswith(key_k):
-                record = line.split('K=')[1].strip()
-
-        # 🚦 Check of findings / Kontrola nálezů
-        if not header or not record:
-            self.normal_logger.log('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON004')
-            self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON004')
-            self.print_window.reset_input_focus()
-            return
-
-        # 📁 Getting the path from config / Získání cesty z configu
+        # 📁 Retrieve output file path from config / Získání cesty k výstupnímu souboru z konfigurace
         output_path = self.config.get_path('output_file_path_c4_product', section='Control4Paths')
-
         if not output_path:
-            self.normal_logger.log('Warning', f'Cesta k výstupnímu souboru Control4 nebyla nalezena.', 'PRICON005')
-            self.messenger.show_warning('Warning', f'Cesta k výstupnímu souboru Control4 nebyla nalezena.', 'PRICON005')
+            self.normal_logger.log('Error', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON004')
+            self.messenger.show_error('Error', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON004', False)
             self.print_window.reset_input_focus()
             return
 
         try:
-            # 💾 Write header + record / Zápis hlavičky + záznamu
+            # 💾 Write header and record to file / Zápis hlavičky a záznamu do souboru
             with output_path.open('w') as file:
                 file.write(header + '\n')
                 file.write(record + '\n')
 
-            # 🗂️ Getting trigger_path from config.ini / Získání trigger_path z config.ini
+            # 🗂️ Retrieve trigger directory from config / Získání složky pro spouštěče z konfigurace
             trigger_dir = self.get_trigger_dir()
-
             if not trigger_dir or not trigger_dir.exists():
-                self.normal_logger.log('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON006')
-                self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON006')
+                self.normal_logger.log('Error', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON005')
+                self.messenger.show_error('Error', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON005', False)
                 self.print_window.reset_input_focus()
                 return
 
-            # 🔎 We find the line with the I= prefix / Najdeme řádek s I= prefixem
-            trigger_line = next((line for line in lbl_lines if line.startswith(key_i)), None)
-
-            if trigger_line:
-                try:
-                    # ✂️ Splitting and creating files by values / Rozdělení a vytvoření souborů podle hodnot
-                    raw_value = trigger_line.split('I=')[1]
-                    trigger_values = [val.strip() for val in raw_value.split(';') if val.strip()]
-
-                    for value in trigger_values:
-                        name = value.strip()
-                        if name:
-                            target_file = trigger_dir / name
-                            target_file.touch(exist_ok=True)
-
-                except Exception as e:
-                    self.normal_logger.log('Error', f'Chyba při tvorbě souborů z I= {str(e)}', 'PRICON007')
-                    self.messenger.show_error('Error', f'{str(e)}', 'PRICON007', False)
-                    self.print_window.reset_input_focus()
+            # ✂️ Create trigger files from values / Vytvoření souborů podle hodnot I=
+            for value in trigger_values:
+                target_file = trigger_dir / value
+                target_file.touch(exist_ok=True)
+                # 💬 Inform the user about printing progress / Informace o průběhu tisku
+                self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etiketu: {value}', 3000)
 
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON008')
-            self.messenger.show_error('Error', f'{str(e)}', 'PRICON008', False)
+            # 🛑 Log and display unexpected error / Zaloguj a zobraz neočekávanou chybu
+            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON006')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON006', False)
             self.print_window.reset_input_focus()
 
     def product_save_and_print(self, header: str, record: str, trigger_values: list[str]) -> None:

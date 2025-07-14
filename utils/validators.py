@@ -123,3 +123,24 @@ class Validator:
         self.messenger.show_error('Error', f'Řádek \"{key_i}\" nebyl nalezen.', 'VALIDATOR007', False)
         self.print_window.reset_input_focus()
         return None
+
+    def validate_input_exists_for_control4(self, lbl_lines: list[str], serial: str) -> bool:
+        """
+        Validates that all key lines for a given serial number exist in lbl_lines.
+        Ověří, že existují řádky SERIAL+I=, J=, K= pro daný serial number.
+
+        :param lbl_lines: Seznam řádků z .lbl souboru
+        :param serial: Zadaný serial number
+        :return: True pokud všechny existují, jinak False + zobrazí warning
+        """
+        keys = [f'{serial}I=', f'{serial}J=', f'{serial}K=']
+        missing_keys = [key for key in keys if not any(line.startswith(key) for line in lbl_lines)]
+
+        if missing_keys:
+            joined = ', '.join(missing_keys)
+            self.normal_logger.log('Error', f'Nebyly nalezeny všechny klíčové řádky: {joined}', 'VALIDATOR008')
+            self.messenger.show_error('Error', f'Některé klíčové řádky v souboru .lbl chybí!', 'VALIDATOR008', False)
+            self.print_window.reset_input_focus()
+            return False
+
+        return True
