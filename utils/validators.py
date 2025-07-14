@@ -144,3 +144,36 @@ class Validator:
             return False
 
         return True
+
+    def extract_my2n_token(self, serial_number: str, reports_path: Path) -> str | None:
+        # 🔧 Rozdělení serial number
+        parts = serial_number.split('-')
+        if len(parts) != 3:
+            self.normal_logger.log('Error', f'Neplatný formát serial number.', 'VALIDATOR009')
+            self.messenger.show_error('Error', f'Neplatný formát serial number.', 'VALIDATOR009', False)
+            return None
+
+        base_code = parts[1] + parts[2]
+        file_name = f'{base_code}.{parts[0]}'
+        subdir1 = f'20{parts[0]}'
+        subdir2 = parts[1]
+
+        source_file = reports_path / subdir1 / subdir2 / file_name
+        if not source_file.exists():
+            self.normal_logger.log('Error', f'Report soubor {source_file} neexistuje.', 'VALIDATOR010')
+            self.messenger.show_error('Error', f'Report soubor {source_file} neexistuje.', 'VALIDATOR010', False)
+            return None
+
+        try:
+            lines = source_file.read_text().splitlines()
+            token_line = next((line for line in reversed(lines) if 'My2N token:' in line), None)
+            if not token_line:
+                self.normal_logger.log('Error', f'V souboru nebyl nalezen žádný My2N token.', 'VALIDATOR011')
+                self.messenger.show_error('Error', f'V souboru nebyl nalezen žádný My2N token.', 'VALIDATOR011', False)
+                return None
+            token = token_line.split('My2N token:')[1].strip()
+            return token
+        except Exception as e:
+            self.normal_logger.log('Error', f'Chyba čtení nebo extrakce: {str(e)}', 'VALIDATOR012')
+            self.messenger.show_error('Error', f'{str(e)}', 'VALIDATOR012', False)
+            return None
