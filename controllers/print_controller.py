@@ -214,7 +214,7 @@ class PrintController:
 
         :param header:
         :param record:
-        :trigger_values: 
+        :trigger_values:
         """
 
         # 📁 Getting the path from config / Získání cesty z configu
