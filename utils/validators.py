@@ -1,5 +1,6 @@
 from core.logger import Logger
 from core.messenger import Messenger
+from utils.szv_utils import get_value_prefix
 
 
 class Validator:
@@ -32,23 +33,28 @@ class Validator:
 
         return True
 
-    def validate_injection_balice(self, header_fields: list[str], record_fields: list[str]) -> int | None:
+    def validate_and_inject_balice(self, header: str, record: str) -> str | None:
         """
-        Validates and returns index of 'P Znacka balice' in header_fields.
-        Zkontroluje přítomnost pole a jeho indexaci vůči record_fields.
+        Validates and injects prefix to 'P Znacka balice' field.
+        Zkontroluje správnost, provede injekci do record, nebo vrátí None při chybě.
+        """
+        header_fields = header.split('","')
+        record_fields = record.split('","')
 
-        :return: Validní index nebo None pokud není bezpečné provést injekci
-        """
         try:
             index = header_fields.index('P Znacka balice')
             if index >= len(record_fields):
-                self.normal_logger.log('Error', f'Neplatný index pole "P Znacka balice" v record.', 'VALIDATOR002')
-                self.messenger.show_error('Error', f'Neplatný index pole "P Znacka balice".', 'VALIDATOR002', False)
+                self.normal_logger.log('Error', 'Neplatný index pole "P Znacka balice"', 'VALIDATOR002')
+                self.messenger.show_error('Error', 'Neplatný index pole v record.', 'VALIDATOR002', False)
                 self.print_window.reset_input_focus()
                 return None
-            return index
+
+            prefix = get_value_prefix()
+            record_fields[index] = prefix
+            return '","'.join(record_fields)
+
         except ValueError:
-            self.normal_logger.log('Error', f'Pole "P Znacka balice" nebylo nalezeno v hlavičce.', 'VALIDATOR003')
-            self.messenger.show_error('Error', f'Pole "P Znacka balice" chybí.', 'VALIDATOR003', False)
+            self.normal_logger.log('Error', 'Pole "P Znacka balice" chybí.', 'VALIDATOR003')
+            self.messenger.show_error('Error', 'Pole v header nebylo nalezeno.', 'VALIDATOR003', False)
             self.print_window.reset_input_focus()
             return None
