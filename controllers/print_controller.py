@@ -7,7 +7,6 @@ from core.logger import Logger
 from core.messenger import Messenger
 from views.print_window import PrintWindow
 from core.config_loader import ConfigLoader
-from utils.szv_utils import get_value_prefix
 from utils.validators import Validator
 
 
@@ -231,25 +230,10 @@ class PrintController:
                 record = line.split('E=')[1].strip()
 
         # ✨ Inject value_prefix to proper position / Vložení prefixu na správné místo
-        try:
-            header_fields = header.split('","')
-            record_fields = record.split('","')
-            znacka_index = header_fields.index('P Znacka balice')
-            prefix = get_value_prefix()
-
-            if znacka_index < len(record_fields):
-                record_fields[znacka_index] = prefix
-                record = '","'.join(record_fields)
-            else:
-                self.normal_logger.log('Warning', f'Pole "P Znacka balice" má neplatný index v record.', 'PRICON010')
-                self.messenger.show_warning('Warning', f'Pole "P Znacka balice" má neplatný index v record.', 'PRICON010')
-                self.print_window.reset_input_focus()
-                return
-        except ValueError:
-            self.normal_logger.log('Warning', f'Pole "P Znacka balice" nebylo nalezeno v hlavičce.', 'PRICON011')
-            self.messenger.show_warning('Warning', f'Pole "P Znacka balice" nebylo nalezeno v hlavičce.', 'PRICON011')
-            self.print_window.reset_input_focus()
-            return
+        new_record = self.validator.validate_and_inject_balice(header, record)
+        if new_record is None:
+            return  # ⛔ validace selhala → vše už obslouženo
+        record = new_record
 
         # 📁 Getting the path from config / Získání cesty z configu
         output_path = self.config.get_path('output_file_path_product', section='ProductPaths')
