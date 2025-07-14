@@ -220,6 +220,11 @@ class PrintController:
         """
         # 🧠 Getting input from a scan / Získání vstupu ze scanu
         base_input = self.serial_input
+
+        # 🔍 Validation of the existence of all three key rows / Validace existence všech tří klíčových řádků
+        if not self.validator.validate_input_exists_for_product(lbl_lines, base_input):
+            return
+
         key_b = f'{base_input}B='
         key_d = f'{base_input}D='
         key_e = f'{base_input}E='
@@ -232,16 +237,6 @@ class PrintController:
                 header = line.split('D=')[1].strip()
             elif line.startswith(key_e):
                 record = line.split('E=')[1].strip()
-
-        # 🚦 Check of findings / Kontrola nálezů
-        try:
-            if not header or not record:
-                self.normal_logger.log('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON009')
-                self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON009')
-                self.print_window.reset_input_focus()
-                return
-        except (AttributeError, TypeError) as e:
-            self.normal_logger.log('Warning', f'{e}.', 'PRICON009')
 
         # ✨ Inject value_prefix to proper position / Vložení prefixu na správné místo
         try:
