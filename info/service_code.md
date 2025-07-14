@@ -12,5 +12,6 @@
     <tr><td>LOGCONxxx</td><td>login_controller.py</td></tr>
     <tr><td>WORORCONxxx</td><td>work_order_controller.py</td></tr>
     <tr><td>PRICONxxx</td><td>print_controller.py</td></tr>
+    <tr><td>VALIDATORxxx</td><td>validators.py</td></tr>
   </tbody>
 </table>
