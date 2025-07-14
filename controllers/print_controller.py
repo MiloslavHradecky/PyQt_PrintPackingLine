@@ -122,6 +122,9 @@ class PrintController:
             self.reset_input_focus()
             return []
 
+    def validate_input_exists(self):
+        pass
+
     def control4_save_and_print(self, lbl_lines: list[str]) -> None:
         """
         Extracts header and record for the scanned serial number and writes them to Control4 output file.
