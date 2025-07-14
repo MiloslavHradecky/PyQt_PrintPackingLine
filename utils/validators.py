@@ -25,8 +25,8 @@ class Validator:
 
         if missing_keys:
             joined = ', '.join(missing_keys)
-            self.normal_logger.log('Warning', f'Nebyly nalezeny všechny klíčové řádky: {joined}', 'VALIDAT001')
-            self.messenger.show_warning('Warning', f'Některé klíčové řádky chybí: {joined}', 'VALIDAT001')
+            self.normal_logger.log('Error', f'Nebyly nalezeny všechny klíčové řádky: {joined}', 'VALIDATOR001')
+            self.messenger.show_error('Error', f'Některé klíčové řádky v souboru .lbl chybí!', 'VALIDATOR001', False)
             self.print_window.reset_input_focus()
             return False
 

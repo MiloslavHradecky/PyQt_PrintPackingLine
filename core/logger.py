@@ -83,7 +83,7 @@ class Logger:
             with Path(self.log_file_path).open('a', encoding='utf-8') as f:
                 f.write('\n')  # ✅ Adding an empty row if 'spaced=True' / Přidání prázdného řádku pokud je 'spaced=True'
 
-        log_message = f'{message.ljust(50)} (ID: {error_code})'
+        log_message = f'{message.ljust(10)} (ID: {error_code})'
 
         if level == 'Info':
             logging.info(log_message)
@@ -105,7 +105,7 @@ class Logger:
             with Path(self.log_file_path).open('a', encoding='utf-8') as f:
                 f.write('\n')  # ✅ Adding an empty row if 'spaced=True' / Přidání prázdného řádku pokud je 'spaced=True'
 
-        log_message = message.ljust(50)
+        log_message = message.ljust(10)
 
         if level == 'Info':
             logging.info(log_message)
