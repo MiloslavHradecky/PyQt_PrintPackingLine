@@ -85,7 +85,7 @@ class PrintController:
         pattern = r'^\d{2}-\d{4}-\d{4}$'
         if not re.fullmatch(pattern, input_value):
             self.messenger.show_info('Info', f'Serial number musí být ve formátu 00-0000-0000.')
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
             return False
 
         return True
@@ -103,7 +103,7 @@ class PrintController:
         if not orders_path:
             self.normal_logger.log('Error', f'Konfigurační cesta {orders_path} nebyla nalezena!', 'PRICON001')
             self.messenger.show_error('Error', f'Konfigurační cesta {orders_path} nebyla nalezena!', 'PRICON001', False)
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
             return []
 
         # 🧩 Build path to .lbl file / Sestavení cesty k .lbl souboru
@@ -112,7 +112,7 @@ class PrintController:
         if not lbl_file.exists():
             self.normal_logger.log('Warning', f'Soubor {lbl_file} neexistuje.', 'PRICON002')
             self.messenger.show_info('Warning', f'Soubor {lbl_file} neexistuje.', 'PRICON002')
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
             return []
 
         try:
@@ -121,7 +121,7 @@ class PrintController:
         except Exception as e:
             self.normal_logger.log('Error', f'Chyba načtení souboru {str(e)}', 'PRICON003')
             self.messenger.show_error('Error', f'{str(e)}', 'PRICON003', False)
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
             return []
 
     def validate_input_exists(self):
@@ -156,7 +156,7 @@ class PrintController:
         if not header or not record:
             self.normal_logger.log('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON004')
             self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON004')
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
             return
 
         # 📁 Getting the path from config / Získání cesty z configu
@@ -165,7 +165,7 @@ class PrintController:
         if not output_path:
             self.normal_logger.log('Warning', f'Cesta k výstupnímu souboru Control4 nebyla nalezena.', 'PRICON005')
             self.messenger.show_warning('Warning', f'Cesta k výstupnímu souboru Control4 nebyla nalezena.', 'PRICON005')
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
             return
 
         try:
@@ -180,7 +180,7 @@ class PrintController:
             if not trigger_dir or not trigger_dir.exists():
                 self.normal_logger.log('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON006')
                 self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON006')
-                self.reset_input_focus()
+                self.print_window.reset_input_focus()
                 return
 
             # 🔎 We find the line with the I= prefix / Najdeme řádek s I= prefixem
@@ -201,12 +201,12 @@ class PrintController:
                 except Exception as e:
                     self.normal_logger.log('Error', f'Chyba při tvorbě souborů z I= {str(e)}', 'PRICON007')
                     self.messenger.show_error('Error', f'{str(e)}', 'PRICON007', False)
-                    self.reset_input_focus()
+                    self.print_window.reset_input_focus()
 
         except Exception as e:
             self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON008')
             self.messenger.show_error('Error', f'{str(e)}', 'PRICON008', False)
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
 
     def product_save_and_print(self, lbl_lines: list[str]) -> None:
         """
@@ -238,7 +238,7 @@ class PrintController:
             if not header or not record:
                 self.normal_logger.log('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON009')
                 self.messenger.show_warning('Warning', f'Není dostupná hlavička nebo data pro serial number "{base_input}".', 'PRICON009')
-                self.reset_input_focus()
+                self.print_window.reset_input_focus()
                 return
         except (AttributeError, TypeError) as e:
             self.normal_logger.log('Warning', f'{e}.', 'PRICON009')
@@ -256,12 +256,12 @@ class PrintController:
             else:
                 self.normal_logger.log('Warning', f'Pole "P Znacka balice" má neplatný index v record.', 'PRICON010')
                 self.messenger.show_warning('Warning', f'Pole "P Znacka balice" má neplatný index v record.', 'PRICON010')
-                self.reset_input_focus()
+                self.print_window.reset_input_focus()
                 return
         except ValueError:
             self.normal_logger.log('Warning', f'Pole "P Znacka balice" nebylo nalezeno v hlavičce.', 'PRICON011')
             self.messenger.show_warning('Warning', f'Pole "P Znacka balice" nebylo nalezeno v hlavičce.', 'PRICON011')
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
             return
 
         # 📁 Getting the path from config / Získání cesty z configu
@@ -270,7 +270,7 @@ class PrintController:
         if not output_path:
             self.normal_logger.log('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON012')
             self.messenger.show_warning('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON012')
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
             return
 
         try:
@@ -285,7 +285,7 @@ class PrintController:
             if not trigger_dir or not trigger_dir.exists():
                 self.normal_logger.log('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON013')
                 self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON013')
-                self.reset_input_focus()
+                self.print_window.reset_input_focus()
                 return
 
             # 🔎 Find the line with B= prefix / Najdeme řádek s B= prefixem
@@ -307,12 +307,12 @@ class PrintController:
                 except Exception as e:
                     self.normal_logger.log('Error', f'Chyba při tvorbě souborů z B= {str(e)}', 'PRICON014')
                     self.messenger.show_error('Error', f'{str(e)}', 'PRICON014', False)
-                    self.reset_input_focus()
+                    self.print_window.reset_input_focus()
 
         except Exception as e:
             self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON015')
             self.messenger.show_error('Error', f'{str(e)}', 'PRICON015', False)
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
 
     def my2n_save_and_print(self) -> None:
         """
@@ -446,15 +446,7 @@ class PrintController:
             self.my2n_save_and_print()
 
         self.normal_logger.add_blank_line()
-        self.reset_input_focus()
-
-    def reset_input_focus(self):
-        """
-        Clears the input field and sets focus back to it.
-        Vymaže vstupní pole a nastaví znovu focus.
-        """
-        self.print_window.serial_number_input.clear()
-        self.print_window.serial_number_input.setFocus()
+        self.print_window.reset_input_focus()
 
     def handle_exit(self):
         """

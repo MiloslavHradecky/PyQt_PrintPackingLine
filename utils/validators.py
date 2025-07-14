@@ -27,7 +27,7 @@ class Validator:
             joined = ', '.join(missing_keys)
             self.normal_logger.log('Warning', f'Nebyly nalezeny všechny klíčové řádky: {joined}', 'VALIDAT001')
             self.messenger.show_warning('Warning', f'Některé klíčové řádky chybí: {joined}', 'VALIDAT001')
-            self.reset_input_focus()
+            self.print_window.reset_input_focus()
             return False
 
         return True

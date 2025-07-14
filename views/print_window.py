@@ -134,3 +134,11 @@ class PrintWindow(QWidget):
 
         # ✨ Launch animation / Vizuální animace
         self.effects.fade_in(self, duration=1000)
+
+    def reset_input_focus(self):
+        """
+        Clears the input field and sets focus back to it.
+        Vymaže vstupní pole a nastaví znovu focus.
+        """
+        self.serial_number_input.clear()
+        self.serial_number_input.setFocus()
