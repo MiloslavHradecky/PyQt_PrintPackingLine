@@ -426,7 +426,7 @@ class PrintController:
             if not self.validator.validate_input_exists_for_product(lbl_lines, self.serial_input):
                 return
             self.product_save_and_print(lbl_lines)
-            self.normal_logger.clear_log('Info', f'{self.product_name}test {self.serial_input}')
+            self.normal_logger.clear_log('Info', f'{self.product_name} {self.serial_input}')
 
         if 'control4' in triggers and lbl_lines:
             self.control4_save_and_print(lbl_lines)
