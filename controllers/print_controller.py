@@ -8,6 +8,7 @@ from core.messenger import Messenger
 from views.print_window import PrintWindow
 from core.config_loader import ConfigLoader
 from utils.szv_utils import get_value_prefix
+from utils.validators import Validator
 
 
 class PrintController:
@@ -33,6 +34,7 @@ class PrintController:
         """
         self.window_stack = window_stack
         self.print_window = PrintWindow(order_code, product_name, controller=self)
+        self.validator = Validator(self.print_window)
 
         self.messenger = Messenger(parent=self.print_window)
         self.config = ConfigLoader()
