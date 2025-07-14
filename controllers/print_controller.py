@@ -209,44 +209,44 @@ class PrintController:
         Extracts header and record for the scanned serial number and writes them to product output file.
         Načte hlavičku a záznam z řádků .lbl pro naskenovaný serial number a zapíše je do výstupního souboru product.
 
-        - Hledá řádky začínající na: SERIAL+B= a SERIAL+D= a SERIAL+E=
-        - Pokud najde hlavičku i záznam, zapíše je do výstupního souboru
-
-        :param header:
-        :param record:
-        :trigger_values:
+        :param header: extracted header line / extrahovaná hlavička z .lbl
+        :param record: extracted record line / extrahovaný záznam z .lbl
+        :param trigger_values: list of trigger filenames / seznam názvů souborů spouštěče
         """
 
-        # 📁 Getting the path from config / Získání cesty z configu
+        # 📁 Retrieve output file path from config / Získání cesty k výstupnímu souboru z konfigurace
         output_path = self.config.get_path('output_file_path_product', section='ProductPaths')
         if not output_path:
-            self.normal_logger.log('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON012')
-            self.messenger.show_warning('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON012')
+            self.normal_logger.log('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON009')
+            self.messenger.show_warning('Warning', f'Cesta k výstupnímu souboru product nebyla nalezena.', 'PRICON009')
             self.print_window.reset_input_focus()
             return
 
         try:
-            # 💾 Writing header + record / Zápis hlavičky + záznamu
+            # 💾 Write header and record to file / Zápis hlavičky a záznamu do souboru
             with output_path.open('w') as file:
                 file.write(header + '\n')
                 file.write(record + '\n')
 
-            # 🗂️ Getting trigger_path from config.ini / Získání trigger_path z config.ini
+            # 🗂️ Retrieve trigger directory from config / Získání složky pro spouštěče z konfigurace
             trigger_dir = self.get_trigger_dir()
             if not trigger_dir or not trigger_dir.exists():
-                self.normal_logger.log('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON013')
-                self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON013')
+                self.normal_logger.log('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON010')
+                self.messenger.show_warning('Warning', f'Složka trigger_path neexistuje nebo není zadána.', 'PRICON010')
                 self.print_window.reset_input_focus()
                 return
 
+            # ✂️ Create trigger files from values / Vytvoření souborů podle hodnot B=
             for value in trigger_values:
                 target_file = trigger_dir / value
                 target_file.touch(exist_ok=True)
+                # 💬 Inform the user about printing progress / Informace o průběhu tisku
                 self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etiketu: {value}', 3000)
 
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON015')
-            self.messenger.show_error('Error', f'{str(e)}', 'PRICON015', False)
+            # 🛑 Log and display unexpected error / Zaloguj a zobraz neočekávanou chybu
+            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON011')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON011', False)
             self.print_window.reset_input_focus()
 
     def my2n_save_and_print(self) -> None:
@@ -273,39 +273,39 @@ class PrintController:
         output_path = self.config.get_path('output_file_path_my2n', section='My2nPaths')
 
         if not reports_path or not output_path:
-            self.normal_logger.log('Error', f'Cesty nejsou definovány v config.ini.', 'PRICON016')
-            self.messenger.show_error('Error', f'Cesty nejsou definovány v config.ini.', 'PRICON016', False)
+            self.normal_logger.log('Error', f'Cesty nejsou definovány v config.ini.', 'PRICON012')
+            self.messenger.show_error('Error', f'Cesty nejsou definovány v config.ini.', 'PRICON012', False)
             return
 
         # 🧩 Final path to the input file / Finální cesta ke vstupnímu souboru
         source_file = reports_path / subdir1 / subdir2 / file_name
 
         if not source_file.exists():
-            self.normal_logger.log('Info', f'Report soubor {source_file} neexistuje.', 'PRICON017')
-            self.messenger.show_info('Info', f'Report soubor {source_file} neexistuje.', 'PRICON017')
+            self.normal_logger.log('Info', f'Report soubor {source_file} neexistuje.', 'PRICON013')
+            self.messenger.show_info('Info', f'Report soubor {source_file} neexistuje.', 'PRICON013')
             return
 
         try:
             lines = source_file.read_text().splitlines()
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba čtení {str(e)}', 'PRICON018')
-            self.messenger.show_error('Error', f'{str(e)}', 'PRICON018', False)
+            self.normal_logger.log('Error', f'Chyba čtení {str(e)}', 'PRICON014')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON014', False)
             return
 
         # 🔎 We find the last occurrence of "My2N token:" / Najdeme poslední výskyt "My2N token:"
         token_line = next((line for line in reversed(lines) if 'My2N token:' in line), None)
 
         if not token_line:
-            self.normal_logger.log('Warning', f'V souboru nebyl nalezen žádný My2N token.', 'PRICON019')
-            self.messenger.show_warning('Warning', f'V souboru nebyl nalezen žádný My2N token.', 'PRICON019')
+            self.normal_logger.log('Warning', f'V souboru nebyl nalezen žádný My2N token.', 'PRICON015')
+            self.messenger.show_warning('Warning', f'V souboru nebyl nalezen žádný My2N token.', 'PRICON015')
             return
 
         # ✂️ Token extraction / Extrakce tokenu
         try:
             token = token_line.split('My2N token:')[1].strip()
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba extrakce {str(e)}', 'PRICON020')
-            self.messenger.show_error('Error', f'Chyba extrakce {str(e)}', 'PRICON020', False)
+            self.normal_logger.log('Error', f'Chyba extrakce {str(e)}', 'PRICON016')
+            self.messenger.show_error('Error', f'Chyba extrakce {str(e)}', 'PRICON016', False)
             return
 
         # 📄 Write to output file / Zápis do výstupního souboru
@@ -325,15 +325,15 @@ class PrintController:
                     trigger_file.touch(exist_ok=True)
 
                 except Exception as e:
-                    self.normal_logger.log('Error', f'Chyba trigger souboru {str(e)}', 'PRICON021')
-                    self.messenger.show_error('Error', f'Chyba trigger souboru {str(e)}', 'PRICON021', False)
+                    self.normal_logger.log('Error', f'Chyba trigger souboru {str(e)}', 'PRICON017')
+                    self.messenger.show_error('Error', f'Chyba trigger souboru {str(e)}', 'PRICON017', False)
             else:
-                self.normal_logger.log('Warning', f'Složka "trigger_path" není definována nebo neexistuje.', 'PRICON022')
-                self.messenger.show_warning('Warning', f'Složka "trigger_path" není definována nebo neexistuje.', 'PRICON022')
+                self.normal_logger.log('Warning', f'Složka "trigger_path" není definována nebo neexistuje.', 'PRICON018')
+                self.messenger.show_warning('Warning', f'Složka "trigger_path" není definována nebo neexistuje.', 'PRICON018')
 
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON023')
-            self.messenger.show_error('Error', f'{str(e)}', 'PRICON023', False)
+            self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON019')
+            self.messenger.show_error('Error', f'{str(e)}', 'PRICON019', False)
 
     def get_trigger_groups_for_product(self) -> list[str]:
         """
@@ -369,8 +369,8 @@ class PrintController:
         # === 3️⃣ Load corresponding .lbl file lines / Načtení řádků ze souboru .lbl
         lbl_lines = self.load_file_lbl()
         if not lbl_lines:
-            self.normal_logger.log('Error', f'Soubor .lbl nelze načíst nebo je prázdný!', 'PRICON024')
-            self.messenger.show_error('Error', 'Soubor .lbl nelze načíst nebo je prázdný!', 'PRICON024', False)
+            self.normal_logger.log('Error', f'Soubor .lbl nelze načíst nebo je prázdný!', 'PRICON020')
+            self.messenger.show_error('Error', 'Soubor .lbl nelze načíst nebo je prázdný!', 'PRICON020', False)
             return
 
         # 📌 Execute save-and-print functions as needed / Spuštění odpovídajících funkcí
