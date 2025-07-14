@@ -58,3 +58,23 @@ class Validator:
             self.messenger.show_error('Error', 'Pole v header nebylo nalezeno.', 'VALIDATOR003', False)
             self.print_window.reset_input_focus()
             return None
+
+    def extract_header_and_record(self, lbl_lines: list[str], serial: str) -> tuple[str, str] | None:
+        key_d = f'{serial}D='
+        key_e = f'{serial}E='
+        header = None
+        record = None
+
+        for line in lbl_lines:
+            if line.startswith(key_d):
+                header = line.split('D=')[1].strip()
+            elif line.startswith(key_e):
+                record = line.split('E=')[1].strip()
+
+        if not header or not record:
+            self.normal_logger.log('Error', f'Nebyly nalezeny hlavička nebo záznam pro "{serial}".', 'VALIDATOR004')
+            self.messenger.show_error('Error', f'Nebyly nalezeny hlavička nebo záznam pro "{serial}".', 'VALIDATOR004', False)
+            self.print_window.reset_input_focus()
+            return None
+
+        return header, record

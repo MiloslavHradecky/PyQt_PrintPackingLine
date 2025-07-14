@@ -399,33 +399,34 @@ class PrintController:
 
         # === 3️⃣ Load corresponding .lbl file lines / Načtení řádků ze souboru .lbl
         lbl_lines = self.load_file_lbl()
+        if not lbl_lines:
+            self.normal_logger.log('Error', f'Soubor .lbl nelze načíst nebo je prázdný!', 'PRICON024')
+            self.messenger.show_error('Error', 'Soubor .lbl nelze načíst nebo je prázdný!', 'PRICON024', False)
+            return
 
-        # === 4️⃣ Execute save-and-print functions as needed / Spuštění odpovídajících funkcí
+        # 📌 Execute save-and-print functions as needed / Spuštění odpovídajících funkcí
         if 'product' in triggers and lbl_lines:
+
+            # === 1️⃣ Validate presence of required lines / Validace existence B/D/E řádků
             if not self.validator.validate_input_exists_for_product(lbl_lines, self.serial_input):
                 return
 
-            # 🔍 Extrakce header a record
-            base_input = self.serial_input
-            key_d = f'{base_input}D='
-            key_e = f'{base_input}E='
+            # === 2️⃣ Extract header and record / Získání D= a E= řádků
+            result = self.validator.extract_header_and_record(lbl_lines, self.serial_input)
+            if not result:
+                return
 
-            header = None
-            record = None
+            header, record = result
 
-            for line in lbl_lines:
-                if line.startswith(key_d):
-                    header = line.split('D=')[1].strip()
-                elif line.startswith(key_e):
-                    record = line.split('E=')[1].strip()
-
-            # 🛡️ Validace + injekce prefixu ještě před uložením
+            # === 3️⃣ Inject prefix to record / Vložení prefixu do správného pole
             new_record = self.validator.validate_and_inject_balice(header, record)
             if new_record is None:
-                return  # ⛔ validace selhala → neprovádět print
+                return
 
-            # 💾 Předej record do kontroleru
+            # === 4️⃣ Save and print / Spuštění zápisu výstupního souboru
             self.product_save_and_print(lbl_lines, new_record)
+
+            # === 5️⃣ Log success
             self.normal_logger.clear_log('Info', f'{self.product_name} {self.serial_input}')
 
         if 'control4' in triggers and lbl_lines:
