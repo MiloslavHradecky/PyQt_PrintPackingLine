@@ -78,3 +78,16 @@ class Validator:
             return None
 
         return header, record
+
+    def extract_trigger_values(self, lbl_lines: list[str], serial: str) -> list[str] | None:
+        key_b = f'{serial}B='
+        for line in lbl_lines:
+            if line.startswith(key_b):
+                raw_value = line.split('B=')[1]
+                values = [val.strip() for val in raw_value.split(';') if val.strip()]
+                return values
+
+        self.normal_logger.log('Warning', f'Řádek \"{key_b}\" nebyl nalezen.', 'VALIDATOR005')
+        self.messenger.show_warning('Varování', f'Řádek \"{key_b}\" nebyl nalezen.', 'VALIDATOR005')
+        self.print_window.reset_input_focus()
+        return None
