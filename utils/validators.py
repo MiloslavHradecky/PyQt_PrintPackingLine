@@ -4,8 +4,8 @@ from core.messenger import Messenger
 
 class Validator:
     def __init__(self, print_window):
-        self.messenger = Messenger(parent=self.print_window)
         self.print_window = print_window
+        self.messenger = Messenger(parent=self.print_window)
 
         # 📝 Logging setup / Nastavení loggeru
         self.normal_logger = Logger(spaced=False)
