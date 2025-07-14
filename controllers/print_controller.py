@@ -404,7 +404,26 @@ class PrintController:
             self.normal_logger.clear_log('Info', f'{self.product_name} {self.serial_input}')
 
         if 'control4' in triggers and lbl_lines:
-            self.control4_save_and_print(lbl_lines)
+            # === 1️⃣ Validace vstupních řádků I/J/K
+            if not self.validator.validate_input_exists_for_control4(lbl_lines, self.serial_input):
+                return
+
+            # === 2️⃣ Získání hlavičky a záznamu z J= a K=
+            result = self.validator.extract_header_and_record_c4(lbl_lines, self.serial_input)
+            if not result:
+                return
+            header, record = result
+
+            # === 3️⃣ Získání hodnot z I= řádku
+            trigger_values = self.validator.extract_trigger_values_c4(lbl_lines, self.serial_input)
+            if not trigger_values:
+                return
+
+            # === 4️⃣ Spuštění zápisu pro Control4
+            self.control4_save_and_print(header, record, trigger_values)
+
+            # === 5️⃣ Zápis do logu
+            self.normal_logger.clear_log('Info', f'Control4 {self.serial_input}')
 
         if 'my2n' in triggers:
             self.my2n_save_and_print()

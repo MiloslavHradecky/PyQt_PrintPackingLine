@@ -87,7 +87,39 @@ class Validator:
                 values = [val.strip() for val in raw_value.split(';') if val.strip()]
                 return values
 
-        self.normal_logger.log('Warning', f'Řádek \"{key_b}\" nebyl nalezen.', 'VALIDATOR005')
-        self.messenger.show_warning('Varování', f'Řádek \"{key_b}\" nebyl nalezen.', 'VALIDATOR005')
+        self.normal_logger.log('Error', f'Řádek \"{key_b}\" nebyl nalezen.', 'VALIDATOR005')
+        self.messenger.show_error('Error', f'Řádek \"{key_b}\" nebyl nalezen.', 'VALIDATOR005', False)
+        self.print_window.reset_input_focus()
+        return None
+
+    def extract_header_and_record_c4(self, lbl_lines: list[str], serial: str) -> tuple[str, str] | None:
+        key_j = f'{serial}J='
+        key_k = f'{serial}K='
+        header = None
+        record = None
+
+        for line in lbl_lines:
+            if line.startswith(key_j):
+                header = line.split('J=')[1].strip()
+            elif line.startswith(key_k):
+                record = line.split('K=')[1].strip()
+
+        if not header or not record:
+            self.normal_logger.log('Error', f'Nebyly nalezeny J/K řádky pro serial "{serial}".', 'VALIDATOR006')
+            self.messenger.show_error('Error', f'Nebyly nalezeny J/K řádky pro serial "{serial}".', 'VALIDATOR006', False)
+            self.print_window.reset_input_focus()
+            return None
+
+        return header, record
+
+    def extract_trigger_values_c4(self, lbl_lines: list[str], serial: str) -> list[str] | None:
+        key_i = f'{serial}I='
+        for line in lbl_lines:
+            if line.startswith(key_i):
+                raw_value = line.split('I=')[1]
+                return [val.strip() for val in raw_value.split(';') if val.strip()]
+
+        self.normal_logger.log('Error', f'Řádek \"{key_i}\" nebyl nalezen.', 'VALIDATOR007')
+        self.messenger.show_error('Error', f'Řádek \"{key_i}\" nebyl nalezen.', 'VALIDATOR007', False)
         self.print_window.reset_input_focus()
         return None
