@@ -230,12 +230,6 @@ class PrintController:
             elif line.startswith(key_e):
                 record = line.split('E=')[1].strip()
 
-        # ✨ Inject value_prefix to proper position / Vložení prefixu na správné místo
-        new_record = self.validator.validate_and_inject_balice(header, record)
-        if new_record is None:
-            return  # ⛔ validace selhala → vše už obslouženo
-        record = new_record
-
         # 📁 Getting the path from config / Získání cesty z configu
         output_path = self.config.get_path('output_file_path_product', section='ProductPaths')
 
