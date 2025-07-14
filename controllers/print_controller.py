@@ -369,6 +369,7 @@ class PrintController:
             # === 6️⃣ Log success
             self.normal_logger.clear_log('Info', f'{self.product_name} {self.serial_input}')
 
+        # 📌 Execute control4-save-and-print functions as needed / Spuštění odpovídajících funkcí
         if 'control4' in triggers and lbl_lines:
             # === 1️⃣ Validace vstupních řádků I/J/K
             if not self.validator.validate_input_exists_for_control4(lbl_lines, self.serial_input):
@@ -391,6 +392,7 @@ class PrintController:
             # === 5️⃣ Zápis do logu
             self.normal_logger.clear_log('Info', f'Control4 {self.serial_input}')
 
+        # 📌 Execute my2n-save-and-print functions as needed / Spuštění odpovídajících funkcí
         if 'my2n' in triggers:
             self.my2n_save_and_print()
 
