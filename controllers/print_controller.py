@@ -204,7 +204,7 @@ class PrintController:
             self.messenger.show_error('Error', f'{str(e)}', 'PRICON008', False)
             self.print_window.reset_input_focus()
 
-    def product_save_and_print(self, lbl_lines: list[str]) -> None:
+    def product_save_and_print(self, lbl_lines: list[str], record: str) -> None:
         """
         Extracts header and record for the scanned serial number and writes them to product output file.
         Načte hlavičku a záznam z řádků .lbl pro naskenovaný serial number a zapíše je do výstupního souboru product.
@@ -213,6 +213,7 @@ class PrintController:
         - Pokud najde hlavičku i záznam, zapíše je do výstupního souboru
 
         :param lbl_lines: List of lines from .lbl file / Seznam řádků ze souboru
+        :param record:
         """
         # 🧠 Getting input from a scan / Získání vstupu ze scanu
         base_input = self.serial_input
@@ -410,7 +411,27 @@ class PrintController:
             if not self.validator.validate_input_exists_for_product(lbl_lines, self.serial_input):
                 return
 
-            self.product_save_and_print(lbl_lines)
+            # 🔍 Extrakce header a record
+            base_input = self.serial_input
+            key_d = f'{base_input}D='
+            key_e = f'{base_input}E='
+
+            header = None
+            record = None
+
+            for line in lbl_lines:
+                if line.startswith(key_d):
+                    header = line.split('D=')[1].strip()
+                elif line.startswith(key_e):
+                    record = line.split('E=')[1].strip()
+
+            # 🛡️ Validace + injekce prefixu ještě před uložením
+            new_record = self.validator.validate_and_inject_balice(header, record)
+            if new_record is None:
+                return  # ⛔ validace selhala → neprovádět print
+
+            # 💾 Předej record do kontroleru
+            self.product_save_and_print(lbl_lines, new_record)
             self.normal_logger.clear_log('Info', f'{self.product_name} {self.serial_input}')
 
         if 'control4' in triggers and lbl_lines:
