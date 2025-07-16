@@ -315,25 +315,25 @@ class PrintController:
 
         # 📌 Execute control4-save-and-print functions as needed / Spuštění odpovídajících funkcí
         if 'control4' in triggers and lbl_lines:
-            # === 1️⃣ Validace vstupních řádků I/J/K
+            # === 1️⃣ Validation of input lines I/J/K / Validace vstupních řádků I/J/K
             if not self.validator.validate_input_exists_for_control4(lbl_lines, self.serial_input):
                 return
 
-            # === 2️⃣ Získání hlavičky a záznamu z J= a K=
+            # === 2️⃣ Getting header and record from J= and K= / Získání hlavičky a záznamu z J= a K=
             result = self.validator.extract_header_and_record_c4(lbl_lines, self.serial_input)
             if not result:
                 return
             header, record = result
 
-            # === 3️⃣ Získání hodnot z I= řádku
+            # === 3️⃣ Getting values from I= row / Získání hodnot z I= řádku
             trigger_values = self.validator.extract_trigger_values_c4(lbl_lines, self.serial_input)
             if not trigger_values:
                 return
 
-            # === 4️⃣ Spuštění zápisu pro Control4
+            # === 4️⃣ Starting enrolment for Control4 / Spuštění zápisu pro Control4
             self.control4_save_and_print(header, record, trigger_values)
 
-            # === 5️⃣ Zápis do logu
+            # === 5️⃣ Log entry / Zápis do logu
             self.normal_logger.clear_log('Info', f'Control4 {self.serial_input}')
 
         # 📌 Execute my2n-save-and-print functions as needed / Spuštění odpovídajících funkcí

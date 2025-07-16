@@ -1,3 +1,6 @@
+# 🔑 Validator - Validates all inputs
+# Validuje všechny vstupy
+
 from pathlib import Path
 from core.logger import Logger
 from core.messenger import Messenger
@@ -61,6 +64,10 @@ class Validator:
             return None
 
     def extract_header_and_record(self, lbl_lines: list[str], serial: str) -> tuple[str, str] | None:
+        """
+        Extracts D= and E= lines from lbl_lines.
+        Extrahuje řádky D= a E= z lbl souboru.
+        """
         key_d = f'{serial}D='
         key_e = f'{serial}E='
         header = None
@@ -81,6 +88,10 @@ class Validator:
         return header, record
 
     def extract_trigger_values(self, lbl_lines: list[str], serial: str) -> list[str] | None:
+        """
+        Extracts values from B= line.
+        Extrahuje hodnoty ze řádku B=.
+        """
         key_b = f'{serial}B='
         for line in lbl_lines:
             if line.startswith(key_b):
@@ -94,6 +105,10 @@ class Validator:
         return None
 
     def extract_header_and_record_c4(self, lbl_lines: list[str], serial: str) -> tuple[str, str] | None:
+        """
+        Extracts J= and K= lines for Control4.
+        Extrahuje řádky J= a K= pro Control4.
+        """
         key_j = f'{serial}J='
         key_k = f'{serial}K='
         header = None
@@ -114,6 +129,10 @@ class Validator:
         return header, record
 
     def extract_trigger_values_c4(self, lbl_lines: list[str], serial: str) -> list[str] | None:
+        """
+        Extracts values from I= line for Control4.
+        Extrahuje hodnoty z řádku I= pro Control4.
+        """
         key_i = f'{serial}I='
         for line in lbl_lines:
             if line.startswith(key_i):
@@ -147,7 +166,10 @@ class Validator:
         return True
 
     def extract_my2n_token(self, serial_number: str, reports_path: Path) -> str | None:
-        # 🔧 Rozdělení serial number
+        """
+        Extracts My2N token from report file.
+        Získá My2N token ze souboru s reportem.
+        """
         parts = serial_number.split('-')
         if len(parts) != 3:
             self.normal_logger.log('Error', f'Neplatný formát serial number.', 'VALIDATOR009')
@@ -176,7 +198,7 @@ class Validator:
                 self.print_window.reset_input_focus()
                 return None
 
-            # ✂️ Kontrola, zda token existuje
+            # ✂️ Check if the token exists / Kontrola, zda token existuje
             token_parts = token_line.split('My2N token:')
             if len(token_parts) < 2 or not token_parts[1].strip():
                 self.normal_logger.log('Error', 'My2N token je prázdný.', 'VALIDATOR012')
