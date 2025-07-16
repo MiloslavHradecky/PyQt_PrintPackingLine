@@ -1,7 +1,6 @@
 # 🖨️ PrintController – handles logic for serial input, validation, and print action
 # Řídí logiku vstupu serial number, validaci a spuštění tisku
 
-import re
 from pathlib import Path
 from core.logger import Logger
 from core.messenger import Messenger
@@ -71,23 +70,6 @@ class PrintController:
         if path and path.exists():
             return path
         return None
-
-    def validate_serial_number_input(self) -> bool:
-        """
-        Validates the entered serial number against expected format.
-        Ověří, zda zadaný serial number odpovídá formátu 00-0000-0000.
-
-        :return: True if input is valid, else False
-        """
-        input_value = self.serial_input
-
-        pattern = r'^\d{2}-\d{4}-\d{4}$'
-        if not re.fullmatch(pattern, input_value):
-            self.messenger.show_info('Info', f'Serial number musí být ve formátu 00-0000-0000.')
-            self.print_window.reset_input_focus()
-            return False
-
-        return True
 
     def load_file_lbl(self):
         """
@@ -270,7 +252,7 @@ class PrintController:
         """
 
         # === 1️⃣ Validate serial number input / Validace vstupu
-        if not self.validate_serial_number_input():
+        if not self.validator.validate_serial_format(self.serial_input):
             return
 
         # === 2️⃣ Resolve product trigger groups from config / Načtení skupin produktů podle konfigurace

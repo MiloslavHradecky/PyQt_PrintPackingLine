@@ -1,6 +1,7 @@
 # 🔑 Validator - Validates all inputs
 # Validuje všechny vstupy
 
+import re
 from pathlib import Path
 from core.logger import Logger
 from core.messenger import Messenger
@@ -15,6 +16,18 @@ class Validator:
         # 📝 Logging setup / Nastavení loggeru
         self.normal_logger = Logger(spaced=False)
         self.spaced_logger = Logger(spaced=True)
+
+    def validate_serial_format(self, serial_number: str) -> bool:
+        """
+        Validates the serial number format 00-0000-0000.
+        Ověří, zda serial odpovídá formátu 00-0000-0000.
+        """
+        pattern = r'^\d{2}-\d{4}-\d{4}$'
+        if not re.fullmatch(pattern, serial_number):
+            self.messenger.show_info('Info', 'Serial number must be in format 00-0000-0000.')
+            self.print_window.reset_input_focus()
+            return False
+        return True
 
     def validate_input_exists_for_product(self, lbl_lines: list[str], serial: str) -> bool:
         """
