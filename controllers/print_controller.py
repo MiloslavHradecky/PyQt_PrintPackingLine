@@ -7,6 +7,7 @@ from core.messenger import Messenger
 from views.print_window import PrintWindow
 from core.config_loader import ConfigLoader
 from utils.validators import Validator
+from PyQt6.QtCore import QEventLoop, QTimer
 
 
 class PrintController:
@@ -146,6 +147,11 @@ class PrintController:
                 # 💬 Inform the user about printing progress / Informace o průběhu tisku
                 self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etiketu: {value}', 3000)
 
+                # 🛑 Vytvoření prodlevy bez blokace GUI
+                loop = QEventLoop()
+                QTimer.singleShot(3000, loop.quit)
+                loop.exec()
+
         except Exception as e:
             # 🛑 Log and display unexpected error / Zaloguj a zobraz neočekávanou chybu
             self.normal_logger.log('Error', f'Chyba zápisu {str(e)}', 'PRICON006')
@@ -190,6 +196,11 @@ class PrintController:
                 target_file.touch(exist_ok=True)
                 # 💬 Inform the user about printing progress / Informace o průběhu tisku
                 self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etiketu: {value}', 3000)
+
+                # 🛑 Vytvoření prodlevy bez blokace GUI
+                loop = QEventLoop()
+                QTimer.singleShot(3000, loop.quit)
+                loop.exec()
 
         except Exception as e:
             # 🛑 Log and display unexpected error / Zaloguj a zobraz neočekávanou chybu
