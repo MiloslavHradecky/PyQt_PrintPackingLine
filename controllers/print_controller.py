@@ -227,6 +227,13 @@ class PrintController:
                 try:
                     trigger_file = trigger_dir / 'SF_MY2N_A'
                     trigger_file.touch(exist_ok=True)
+                    # 💬 Inform the user about printing progress / Informace o průběhu tisku
+                    self.messenger.show_timed_info('Info', f'Prosím čekejte, tisknu etiketu: SF_MY2N_A', 3000)
+
+                    # 🛑 Vytvoření prodlevy bez blokace GUI
+                    loop = QEventLoop()
+                    QTimer.singleShot(3000, loop.quit)
+                    loop.exec()
                 except Exception as e:
                     self.normal_logger.log('Error', f'Chyba trigger souboru {str(e)}', 'PRICON012')
                     self.messenger.show_error('Error', f'{str(e)}', 'PRICON012', False)
