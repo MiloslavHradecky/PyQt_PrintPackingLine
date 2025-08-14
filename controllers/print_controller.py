@@ -1,6 +1,7 @@
 # 🖨️ PrintController – handles logic for serial input, validation, and print action
 # Řídí logiku vstupu serial number, validaci a spuštění tisku
 
+import time
 from pathlib import Path
 from core.logger import Logger
 from core.messenger import Messenger
@@ -221,6 +222,9 @@ class PrintController:
             with output_path.open('w') as file:
                 file.write('"L Vyrobni cislo dlouhe","L Bezpecnostni cislo","P Vyrobni cislo","P Bezpecnostni kod"\n')
                 file.write(f'"Serial number:","My2N Security Code:","{serial_number}","{token}"\n')
+
+            # 🕒 A short delay to ensure that the write is complete / Krátké zpoždění pro jistotu, že zápis je dokončen
+            time.sleep(1)
 
             trigger_dir = self.get_trigger_dir()
             if trigger_dir and trigger_dir.exists():
