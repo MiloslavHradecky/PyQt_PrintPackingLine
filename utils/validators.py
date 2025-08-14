@@ -204,25 +204,38 @@ class Validator:
 
         try:
             lines = source_file.read_text().splitlines()
-            token_line = next((line for line in reversed(lines) if 'My2N token:' in line), None)
+            token_line = next((line for line in reversed(lines) if 'my2n token:' in line.lower()), None)
             if not token_line:
                 self.normal_logger.log('Error', 'V souboru nebyl nalezen žádný My2N token.', 'VALIDATOR011')
                 self.messenger.show_error('Error', 'V souboru nebyl nalezen žádný My2N token.', 'VALIDATOR011', False)
                 self.print_window.reset_input_focus()
                 return None
 
-            # ✂️ Check if the token exists / Kontrola, zda token existuje
-            token_parts = token_line.split('My2N token:')
-            if len(token_parts) < 2 or not token_parts[1].strip():
-                self.normal_logger.log('Error', 'My2N token je prázdný.', 'VALIDATOR012')
-                self.messenger.show_error('Error', 'My2N token byl nalezen, ale neobsahuje žádnou hodnotu.', 'VALIDATOR012', False)
+            # 🧠 Find the position of the token in the line (case-insensitive search, but case-sensitive extraction) / Najdi pozici tokenu v řádku (case-insensitive hledání, ale case-sensitive extrakce)
+            token_prefix = 'my2n token:'
+            lower_line = token_line.lower()
+            prefix_index = lower_line.find(token_prefix)
+
+            if prefix_index == -1:
+                # Tohle by nemělo nastat, ale pro jistotu
+                self.normal_logger.log('Error', 'Chyba při zpracování řádku s tokenem.', 'VALIDATOR012')
+                self.messenger.show_error('Error', 'Chyba při zpracování řádku s tokenem.', 'VALIDATOR012', False)
                 self.print_window.reset_input_focus()
                 return None
 
-            token = token_parts[1].strip()
-            return token
+            # ✂️ Extract the token from the original line / Extrahuj token z původního řádku
+            token_value = token_line[prefix_index + len(token_prefix):].strip()
+
+            if not token_value:
+                self.normal_logger.log('Error', 'My2N token je prázdný.', 'VALIDATOR013')
+                self.messenger.show_error('Error', 'My2N token byl nalezen, ale neobsahuje žádnou hodnotu.', 'VALIDATOR013', False)
+                self.print_window.reset_input_focus()
+                return None
+
+            return token_value
+
         except Exception as e:
-            self.normal_logger.log('Error', f'Chyba čtení nebo extrakce: {str(e)}', 'VALIDATOR013')
-            self.messenger.show_error('Error', f'{str(e)}', 'VALIDATOR013', False)
+            self.normal_logger.log('Error', f'Chyba čtení nebo extrakce: {str(e)}', 'VALIDATOR014')
+            self.messenger.show_error('Error', f'{str(e)}', 'VALIDATOR014', False)
             self.print_window.reset_input_focus()
             return None
