@@ -111,8 +111,8 @@ class PrintWindow(QWidget):
         self.print_button.setFont(button_font)
         self.print_button.setStyleSheet(button_style)
 
-        # ❌ Exit button / Tlačítko pro výběr 'Ukončit'
-        self.exit_button: QPushButton = QPushButton('Ukončit')
+        # ❌ Back button / Tlačítko pro výběr 'Zpět'
+        self.exit_button: QPushButton = QPushButton('Zpět')
         self.exit_button.setFont(button_font)
         self.exit_button.setStyleSheet(button_style)
 

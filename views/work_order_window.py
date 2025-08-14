@@ -99,8 +99,8 @@ class WorkOrderWindow(QWidget):
         self.next_button.setFont(button_font)
         self.next_button.setStyleSheet(button_style)
 
-        # ❌ Exit button / Tlačítko Ukončit
-        self.exit_button: QPushButton = QPushButton('Ukončit')
+        # ❌ Back button / Tlačítko Zpět
+        self.exit_button: QPushButton = QPushButton('Zpět')
         self.exit_button.setFont(button_font)
         self.exit_button.setStyleSheet(button_style)
 
